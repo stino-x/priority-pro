@@ -1,0 +1,1 @@
+https://appwrite.io/docs/products/auth/oauth2
