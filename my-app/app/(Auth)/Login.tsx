@@ -13,6 +13,8 @@ const LoginPage = () => {
     setLoggedInUser(await account.get());
   };
 
+   
+
   const register = async () => {
     await account.create(ID.unique(), email, password, name);
     login(email, password);
