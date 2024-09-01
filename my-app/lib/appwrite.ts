@@ -1,6 +1,6 @@
 "use server";
 
-import { Databases, Users, Client, Account, OAuthProvider } from "node-appwrite";
+import { Databases, Users, Client, Account } from "node-appwrite";
 import { cookies } from "next/headers";
 
 async function createSessionClient() {
@@ -8,10 +8,11 @@ async function createSessionClient() {
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
     .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!);
 
-  const session = cookies().get("appwrite-session");
-  if (!session || !session.value) {
-    throw new Error("No session");
-  }
+    const session = cookies().get("appwrite-session");
+
+    if (!session || !session.value) {
+      throw new Error("No session");
+    }
 
   client.setSession(session.value);
 
@@ -26,7 +27,7 @@ async function createAdminClient() {
   const client = new Client()
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
     .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!)
-    .setKey(process.env.NEXT_APPWRITE_KEY!);
+    .setKey(process.env.NEXT_PUBLIC_API_KEY!);
 
   return {
     get account() {
@@ -35,7 +36,7 @@ async function createAdminClient() {
     get database() {
       return new Databases(client);
     },
-    get users() {
+    get user() {
       return new Users(client);
     }
   };

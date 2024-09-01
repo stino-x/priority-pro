@@ -10,10 +10,6 @@ const {
   NEXT_PUBLIC_USER_COLLECTION_ID: USER_COLLECTION_ID,
 } = process.env;
 
-if (!DATABASE_ID || !USER_COLLECTION_ID) {
-  throw new Error("Database or Collection ID is missing");
-}
-
 interface SignUpParams {
   email: string;
   password: string;
@@ -29,6 +25,44 @@ interface SignInParams {
 interface getUserInfoProps {
   userId: string,
 }
+
+export const getUserInfo = async ({ userId }: getUserInfoProps) => {
+  try {
+    const { database } = await createAdminClient();
+
+    const user = await database.listDocuments(
+      DATABASE_ID!,
+      USER_COLLECTION_ID!,
+      [Query.equal('userid', [userId])]
+    )
+
+    return parseStringify(user.documents[0]);
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const signIn = async ({ email, password }: SignInParams) => {
+  console.log('session')
+  try {
+    const { account } = await createAdminClient();
+    const session = await account.createEmailPasswordSession(email, password);
+
+    cookies().set("appwrite-session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+    });
+
+    console.log(session)
+    const user = await getUserInfo({ userId: session.$id })
+
+    return parseStringify(user);
+  } catch (error) {
+    console.error('Error occured when siging in:', error);
+  }
+};
 
 export const register = async ({ password, ...userData }: SignUpParams) => {
   const { email, name } = userData;
@@ -58,10 +92,11 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
     );
 
     const session = await account.createEmailPasswordSession(email, password);
+    console.log(session);
 
     cookies().set("appwrite-session", session.secret, {
       path: "/",
-      httpOnly: false,
+      httpOnly: true,
       sameSite: "strict",
       secure: true,
     });
@@ -72,42 +107,19 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
   }
 };
 
-export const getUserInfo = async ({ userId }: getUserInfoProps) => {
+export const getLoggedInUser = async () => {
   try {
-    const { database } = await createAdminClient();
+    const { account } = await createSessionClient();
+    const result = await account.get();
 
-    const user = await database.listDocuments(
-      DATABASE_ID!,
-      USER_COLLECTION_ID!,
-      [Query.equal('userid', [userId])]
-    )
-
-    return parseStringify(user.documents[0]);
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-export const signIn = async ({ email, password }: SignInParams) => {
-
-  try {
-    const { account } = await createAdminClient();
-    const session = await account.createEmailPasswordSession(email, password);
-
-    cookies().set("appwrite-session", session.secret, {
-      path: "/",
-      httpOnly: true,
-      sameSite: "strict",
-      secure: true,
-    });
-
-    const user = await getUserInfo({ userId: session.$id })
+    const user = await getUserInfo({ userId: result.$id})
 
     return parseStringify(user);
   } catch (error) {
-    console.error('Error occured when siging in:', error);
+    console.log(error)
+    return null;
   }
-};
+}
 
 // export const handleOAuthLogin = async (provider: string, successUrl: string, failureUrl: string) => {
 //   return await handleOAuthLogin(provider, successUrl, failureUrl);

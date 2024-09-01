@@ -6,33 +6,18 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import { Form } from "@/components/ui/form"
+import CustomInput from './CustomInput';
 import { useRouter } from 'next/navigation';
+import { authFormSchema } from '@/lib/utils';
 import { register, signIn } from '@/lib/actions/user.action';
 
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Full name must be at least 2 characters.",
-  }).optional(),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
-});
-
-const AuthForm = ({ type }: { type: 'signin' | 'register' }) => {
+const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const formSchema = authFormSchema(type)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,8 +39,8 @@ const AuthForm = ({ type }: { type: 'signin' | 'register' }) => {
           password: data.password
         }
 
-        await register(userData);
-        router.push('/');
+        const newUser = await register(userData);
+        setUser(newUser);
       }
 
       if(type === 'signin') {
@@ -87,49 +72,13 @@ const AuthForm = ({ type }: { type: 'signin' | 'register' }) => {
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-[80vw] sm:w-[40vw] rounded shadow-md shadow-slate-950 p-12 bg-[#fff]">
           {type === 'register' && (
             <>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input className="border-slate-600 bg-[transparent] border-2 rounded" placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <CustomInput control={form.control} name='name' label="Full Name" placeholder='Enter your full name' />
             </>
           )}
 
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input className="border-slate-600 bg-[transparent] border-2 rounded" placeholder="email@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <CustomInput control={form.control} name='email' label="Email" placeholder='Enter your email' />
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input className="border-slate-600 bg-[transparent] border-2 rounded" type="password" placeholder="*********" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <CustomInput control={form.control} name='password' label="Password" placeholder='Enter your password' />
 
           <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
             {isLoading ? 'Loading...' : (type === 'signin' ? 'Sign In' : 'Register')}
