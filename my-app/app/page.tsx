@@ -1,17 +1,24 @@
 "use client";
+import { logoutAccount } from '@/lib/actions/user.action';
 import { useState } from 'react'
-import { account, ID } from "./appwrite";
+import { useRouter } from 'next/navigation'
+
 
 export default function Home() {
-  const [loggedInUser, setLoggedInUser] = useState(null);
-  const logout = async () => {
-    await account.deleteSession("current");
-    setLoggedInUser(null);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const loggedOut = await logoutAccount();
+    
+    if(loggedOut){
+      router.push('/sign-in');
+      console.log('Logged out finish');
+    }
   };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <button type="button" onClick={logout}>
+        <button type="button" onClick={handleLogout}>
           Logout
         </button>
     </main>

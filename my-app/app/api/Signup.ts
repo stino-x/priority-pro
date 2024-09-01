@@ -1,5 +1,5 @@
 import { Client, Account, ID } from "appwrite";
-import { databases } from "../appwrite";
+import { databases } from "../../lib/appwrite";
 
 
 export default async function Signup(req: any, res: any) {
