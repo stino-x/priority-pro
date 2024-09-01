@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation';
-import { register, handleOAuthLogin, signIn } from '@/lib/actions/user.action';
+import { register, signIn } from '@/lib/actions/user.action';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -73,13 +73,13 @@ const AuthForm = ({ type }: { type: 'signin' | 'register' }) => {
     }
   }
 
-  const handleGoogleLogin = async () => {
-    try {
-      await handleOAuthLogin('google', '/dashboard', '/auth/error');
-    } catch (error) {
-      console.error('Google login error:', error);
-    }
-  }
+  // const handleGoogleLogin = async () => {
+  //   try {
+  //     await handleOAuthLogin('google', '/dashboard', '/auth/error');
+  //   } catch (error) {
+  //     console.error('Google login error:', error);
+  //   }
+  // }
 
   return (
     <main className="w-[100vw] h-[100vh] bg-slate-100 flex flex-col justify-center items-center">
@@ -137,7 +137,7 @@ const AuthForm = ({ type }: { type: 'signin' | 'register' }) => {
         </form>
       </Form>
 
-      <Button type="button" onClick={handleGoogleLogin} className="mt-4 w-[80vw] sm:w-[40vw]">
+      <Button type="button" className="mt-4 w-[80vw] sm:w-[40vw]">
         Login with Google
       </Button>
 

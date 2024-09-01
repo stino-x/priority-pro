@@ -3,7 +3,7 @@
 import { ID, Query } from "node-appwrite";
 import { cookies } from "next/headers";
 import { parseStringify } from "../../lib/utils";
-import { clientSideAccount, createAdminClient, createSessionClient } from "../appwrite";
+import { createAdminClient, createSessionClient } from "../appwrite";
 
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
@@ -61,7 +61,7 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
 
     cookies().set("appwrite-session", session.secret, {
       path: "/",
-      httpOnly: true,
+      httpOnly: false,
       sameSite: "strict",
       secure: true,
     });
@@ -73,18 +73,18 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
 };
 
 export const getUserInfo = async ({ userId }: getUserInfoProps) => {
-  try{
+  try {
     const { database } = await createAdminClient();
 
     const user = await database.listDocuments(
       DATABASE_ID!,
-      USER_COLLECTION_ID!
+      USER_COLLECTION_ID!,
       [Query.equal('userid', [userId])]
     )
 
     return parseStringify(user.documents[0]);
-  } catch(error) {
-    console.error(error)
+  } catch (error) {
+    console.log(error)
   }
 }
 
@@ -121,6 +121,6 @@ export const logoutAccount = async () => {
 
     await account.deleteSession('current');
   } catch (error) {
-    console.error('Error logging user out', error)
+    return null;
   }
 }
