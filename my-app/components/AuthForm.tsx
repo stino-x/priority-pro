@@ -10,7 +10,7 @@ import { Form } from "@/components/ui/form"
 import CustomInput from './CustomInput';
 import { useRouter } from 'next/navigation';
 import { authFormSchema } from '@/lib/utils';
-import { register, signIn } from '@/lib/actions/user.action';
+import { register, signIn, handleOAuthLogin } from '@/lib/actions/user.action';
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
@@ -59,13 +59,9 @@ const AuthForm = ({ type }: { type: string }) => {
     }
   }
 
-  // const handleGoogleLogin = async () => {
-  //   try {
-  //     await handleOAuthLogin('google', '/dashboard', '/auth/error');
-  //   } catch (error) {
-  //     console.error('Google login error:', error);
-  //   }
-  // }
+  const handleGoogleLogin = async () => {
+    await handleOAuthLogin();
+  }
 
   return (
     <main className="w-[100vw] h-[100vh] bg-slate-100 flex flex-col justify-center items-center">
@@ -87,7 +83,7 @@ const AuthForm = ({ type }: { type: string }) => {
         </form>
       </Form>
 
-      <Button type="button" className="mt-4 w-[80vw] sm:w-[40vw]">
+      <Button type="button" onClick={handleGoogleLogin} className="mt-4 w-[80vw] sm:w-[40vw]">
         Login with Google
       </Button>
 
