@@ -1,0 +1,119 @@
+{
+    "user_id": "user_456",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "assigned_tasks": [
+      {
+        "task_id": "task_001",
+        "title": "Update Menu for Summer Specials",
+        "description": "Add new summer specials to the menu and update prices for seasonal dishes.",
+        "priority": "High",
+        "status": "In Progress",
+        "restaurant": {
+          "restaurant_id": "restaurant_789",
+          "name": "Sunny Side Diner",
+          "location": "123 Beachfront Ave, Miami, FL"
+        },
+        "created_by": {
+          "user_id": "user_789",
+          "name": "Alice Johnson",
+          "email": "alice.johnson@example.com"
+        },
+        "due_date": "2024-08-25T00:00:00Z",
+        "expected_completion_time": "2024-08-24T17:00:00Z",
+        "created_at": "2024-08-16T09:00:00Z",
+        "updated_at": "2024-08-20T10:30:00Z",
+        "completed_at": null,
+        "verified": {
+          "is_verified": false,
+          "verified_by": null,
+          "verified_at": null
+        },
+        "reassigned": {
+          "is_reassigned": true,
+          "previous_assignee": {
+            "user_id": "user_123",
+            "name": "Alice Johnson"
+          },
+          "new_assignee": {
+            "user_id": "user_456",
+            "name": "John Doe",
+            "assigned_at": "2024-08-20T10:00:00Z"
+          }
+        },
+        "subtasks": [
+          {
+            "subtask_id": "subtask_001",
+            "title": "Design New Menu Layout",
+            "status": "Completed"
+          },
+          {
+            "subtask_id": "subtask_002",
+            "title": "Update Prices for Seasonal Dishes",
+            "status": "In Progress"
+          }
+        ],
+        "attachments": [
+          {
+            "file_name": "summer_specials_menu.pdf",
+            "url": "https://example.com/attachments/summer_specials_menu.pdf",
+            "uploaded_at": "2024-08-16T11:00:00Z"
+          }
+        ],
+        "comments": [
+          {
+            "comment_id": "comment_001",
+            "user_id": "user_789",
+            "comment_text": "Make sure to highlight the new dishes on the first page.",
+            "created_at": "2024-08-18T14:45:00Z"
+          }
+        ]
+      },
+      {
+        "task_id": "task_002",
+        "title": "Organize Staff Training for New Menu",
+        "description": "Coordinate a training session for the staff to familiarize them with the new summer menu.",
+        "priority": "Medium",
+        "status": "Not Started",
+        "restaurant": {
+          "restaurant_id": "restaurant_789",
+          "name": "Sunny Side Diner",
+          "location": "123 Beachfront Ave, Miami, FL"
+        },
+        "created_by": {
+          "user_id": "user_789",
+          "name": "Alice Johnson",
+          "email": "alice.johnson@example.com"
+        },
+        "due_date": "2024-08-30T00:00:00Z",
+        "expected_completion_time": "2024-08-28T12:00:00Z",
+        "created_at": "2024-08-20T10:00:00Z",
+        "updated_at": "2024-08-20T10:30:00Z",
+        "completed_at": null,
+        "verified": {
+          "is_verified": false,
+          "verified_by": null,
+          "verified_at": null
+        },
+        "reassigned": {
+          "is_reassigned": false,
+          "previous_assignee": null,
+          "new_assignee": null
+        },
+        "subtasks": [
+          {
+            "subtask_id": "subtask_003",
+            "title": "Schedule Training Session",
+            "status": "Not Started"
+          },
+          {
+            "subtask_id": "subtask_004",
+            "title": "Prepare Training Materials",
+            "status": "Not Started"
+          }
+        ],
+        "attachments": [],
+        "comments": []
+      }
+    ]
+  }
