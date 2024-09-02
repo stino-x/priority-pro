@@ -45,12 +45,12 @@ const AuthForm = ({ type }: { type: string }) => {
       }
 
       if(type === 'signin') {
-        const response = await signIn({
+        const userData = await signIn({
           email: data.email,
           password: data.password,
         })
 
-        if(response) router.push('/');
+        if(userData) router.push('/');
       }
     } catch (error) {
       console.error(error);
