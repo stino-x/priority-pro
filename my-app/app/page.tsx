@@ -9,11 +9,8 @@ export default function Home() {
 
   const handleLogout = async () => {
     const loggedOut = await logoutAccount();
-    
-    if(loggedOut){
-      router.push('/sign-in');
-      console.log('Logged out finish');
-    }
+    router.push('/signin');
+    console.log('Logged out finish');
   };
 
   return (

@@ -1,9 +1,11 @@
 'use server';
 
-import { ID, Query } from "node-appwrite";
+import { ID, Query, OAuthProvider } from "node-appwrite";
 import { cookies } from "next/headers";
 import { parseStringify } from "../../lib/utils";
 import { createAdminClient, createSessionClient } from "../appwrite";
+import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
@@ -43,7 +45,6 @@ export const getUserInfo = async ({ userId }: getUserInfoProps) => {
 }
 
 export const signIn = async ({ email, password }: SignInParams) => {
-  console.log('session')
   try {
     const { account } = await createAdminClient();
     const session = await account.createEmailPasswordSession(email, password);
@@ -121,9 +122,50 @@ export const getLoggedInUser = async () => {
   }
 }
 
-// export const handleOAuthLogin = async (provider: string, successUrl: string, failureUrl: string) => {
-//   return await handleOAuthLogin(provider, successUrl, failureUrl);
-// };
+export const handleOAuthLogin = async () => {
+  try {
+    const { account } = await createAdminClient();
+
+    const redirectUrl = await account.createOAuth2Token(
+      OAuthProvider.Google,
+      'http://localhost:3000',
+      'http://localhost:3000/fail'
+    );
+
+    redirect(redirectUrl);
+  } catch (error) {
+    console.error('Error logging in with Google:', error);
+  }
+};
+
+export async function GET (request: Request) {
+  try {
+    const url = new URL(request.url);
+
+    const userId = url.searchParams.get("userId");
+    const secret = url.searchParams.get("secret");
+
+    if (!userId || !secret) {
+      throw new Error("Missing userId or secret in the callback URL.");
+    }
+
+    const { account } = await createAdminClient();
+    const session = await account.createSession(userId, secret);
+
+    cookies().set("appwrite-session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+    });
+
+    return NextResponse.redirect(`/`);
+  } catch (error) {
+    console.error('Error during OAuth callback:', error);
+    return NextResponse.redirect(`${new URL(request.url).origin}/auth-error`);
+  }
+};
+
 
 export const logoutAccount = async () => {
   try {
