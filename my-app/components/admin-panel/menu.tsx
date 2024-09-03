@@ -135,6 +135,9 @@ export function Menu({ isOpen }: MenuProps) {
               </Tooltip>
             </TooltipProvider>
           </li>
+          {/* <li>
+            //LANGUAGE TOGGLE
+          </li> */}
         </ul>
       </nav>
     </ScrollArea>
