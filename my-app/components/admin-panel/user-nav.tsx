@@ -20,8 +20,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import useLogout from "@/lib/hooks/useLogout";
 
 export function UserNav() {
+  const { logout } = useLogout()
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -68,7 +70,9 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {}}>
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {
+          logout();
+        }}>
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>

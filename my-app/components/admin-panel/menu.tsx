@@ -15,6 +15,7 @@ import {
   TooltipContent,
   TooltipProvider
 } from "@/components/ui/tooltip";
+import useLogout from "@/lib/hooks/useLogout";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -22,6 +23,7 @@ interface MenuProps {
 
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
+  const {logout} = useLogout();
   const menuList = getMenuList(pathname);
 
   return (
@@ -108,7 +110,9 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => {}}
+                    onClick={() => {
+                      logout();
+                    }}
                     variant="outline"
                     className="w-full justify-center h-10 mt-5"
                   >
