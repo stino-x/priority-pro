@@ -1,6 +1,7 @@
 import { ModeToggle } from "@/components/mode-toggle";
 import { UserNav } from "@/components/admin-panel/user-nav";
 import { SheetMenu } from "@/components/admin-panel/sheet-menu";
+import Calendar from "../calendar/Calendar";
 
 interface NavbarProps {
   title: string;
@@ -15,6 +16,9 @@ export function Navbar({ title }: NavbarProps) {
           <h1 className="font-bold">{title}</h1>
         </div>
         <div className="flex flex-1 items-center space-x-2 justify-end">
+          {title === 'My Tasks' && (
+            <Calendar />
+          )}
           <ModeToggle />
           <UserNav />
         </div>
