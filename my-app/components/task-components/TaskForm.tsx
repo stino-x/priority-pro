@@ -10,19 +10,21 @@ import { useRouter } from "next/navigation";
 // import CustomInput from "@/components/authcomponents/CustomInput";
 import { taskFormSchema } from "@/lib/utils";
 import CustomInput from "@/components/task-components/CustomInput";
+import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
+import useGetUsers from "@/lib/hooks/useGetUsers";
 
-
+interface getUsersHook {
+  users: Array<any>; 
+  //getUsers: () => Promise<void>;
+}
 
 const TaskForm = () => {
   const router = useRouter();
   const formSchema = taskFormSchema();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Fetch users and restaurants when component mounts
-    useGetUsers();
-    useGetRestaurants();
-  }, []);
+  const users = useGetUsers() as getUsersHook;
+  useGetRestaurants();
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -32,7 +34,7 @@ const TaskForm = () => {
       description: "",
       priority: 3,
       due_date: "",
-    //   user: "",
+      user: "",
     //   restaurant: "",
     },
   });
@@ -70,8 +72,16 @@ const TaskForm = () => {
           {/* Assigned User Dropdown */}
           {/* <CustomInput control={form.control} name="user" label="Assign to User" placeholder="Enter user ID" /> */}
 
-          {/* Restaurant Dropdown */}
-          {/* <CustomInput control={form.control} name="restaurant" label="Restaurant" placeholder="Enter restaurant ID" /> */}
+          <CustomInput
+            control={form.control}
+            name="user"
+            label="Assign to User"
+            isDropdown // Indicating it's a dropdown
+            options={users.users.map((user: any) => ({
+              label: user.name,
+              value: user.$id,
+            }))}
+          />
 
           {/* Submit Button */}
           <Button type="submit" className="mt-4 w-full" disabled={isLoading}>

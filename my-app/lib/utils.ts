@@ -22,6 +22,6 @@ export const taskFormSchema = () =>  z.object({
   description: z.string().min(5, "Description must be at least 5 characters"),
   priority: z.number().min(1).max(5, "Priority must be between 1 and 5"),
   due_date: z.string().nonempty("Due date is required"),
-//   user: z.string().nonempty("User is required"),
+  user: z.string().nonempty("User is required"),
 //   restaurant: z.string().nonempty("Restaurant is required"),
 });
