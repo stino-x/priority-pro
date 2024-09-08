@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -17,6 +17,12 @@ const TaskForm = () => {
   const router = useRouter();
   const formSchema = taskFormSchema();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Fetch users and restaurants when component mounts
+    useGetUsers();
+    useGetRestaurants();
+  }, []);
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
