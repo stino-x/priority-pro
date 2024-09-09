@@ -41,12 +41,24 @@ const TaskForm = () => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
+  
     try {
-      // Here, you would call an API to save the task
-      console.log("Task created:", data);
-      router.push("/tasks");  // Redirect after successful task creation
+      const response = await fetch('/api/tasks/createtasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (response.ok) {
+        router.push('/my-tasks');
+      } else {
+        // Handle error (e.g., display a notification)
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error creating task:', error);
+      // Handle error (e.g., display a notification)
     } finally {
       setIsLoading(false);
     }
