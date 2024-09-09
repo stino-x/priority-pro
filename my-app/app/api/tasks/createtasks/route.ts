@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/appwrite';
+import { createAdminClient, createSessionClient } from '@/lib/appwrite';
 import { taskFormSchema } from '@/lib/utils';
 
 export async function POST(request: Request) {
@@ -8,6 +8,14 @@ export async function POST(request: Request) {
     const parsedData = formSchema.parse(data);
 
     const { database } = await createAdminClient();
+    const { account } = await createSessionClient();
+
+    const currentUser = await account.get();
+    
+    // Extract the user ID
+    const userId = currentUser.$id;
+
+
     await database.createDocument(
       process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
       process.env.NEXT_PUBLIC_APPWRITE_TASKS_COLLECTION_ID!,
@@ -23,6 +31,7 @@ export async function POST(request: Request) {
         created_at: new Date().toISOString(),
         // updated_at: new Date().toISOString(),
         is_verified: false,
+        assigned_by: userId
       }
     );
 
