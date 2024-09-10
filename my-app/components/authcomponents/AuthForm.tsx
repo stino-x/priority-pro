@@ -11,6 +11,7 @@ import CustomInput from './CustomInput';
 import { useRouter } from 'next/navigation';
 import { authFormSchema } from '@/lib/utils';
 import { register, signIn, handleOAuthLogin } from '@/lib/actions/user.action';
+import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
@@ -18,6 +19,7 @@ const AuthForm = ({ type }: { type: string }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const formSchema = authFormSchema(type)
+  const restaurants = useGetRestaurants();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -25,6 +27,7 @@ const AuthForm = ({ type }: { type: string }) => {
       name: "",
       email: "",
       password: "",
+      restaurant: "",
     },
   })
 
@@ -36,7 +39,8 @@ const AuthForm = ({ type }: { type: string }) => {
         const userData = {
           name: data.name!,
           email: data.email,
-          password: data.password
+          password: data.password,
+          restaurant: data.restaurant
         }
 
         const newUser = await register(userData);
@@ -76,6 +80,17 @@ const AuthForm = ({ type }: { type: string }) => {
           <CustomInput control={form.control} name='email' label="Email" placeholder='Enter your email' />
 
           <CustomInput control={form.control} name='password' label="Password" placeholder='Enter your password' />
+
+          <CustomInput
+            control={form.control}
+            name="restaurant"
+            label="your restaurant name"
+            isDropdown // Indicating it's a dropdown
+            options={restaurants.Restaurants.map((restaurant: any) => ({
+              label: restaurant.name,
+              value: restaurant.$id,
+            }))}
+          />
 
           <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
             {isLoading ? 'Loading...' : (type === 'signin' ? 'Sign In' : 'Register')}

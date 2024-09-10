@@ -1,13 +1,13 @@
 import useRestaurantStore from "../store/useGetRestrauntStore";
 
-interface getUsersHook {
+interface getRestaurantHook {
   Restaurants: Array<any>; 
     //getUsers: () => Promise<void>;
 }
   
 
-const useGetRestaurants = (): getUsersHook => {
-  const { Restaurants } =  useRestaurantStore() as getUsersHook;
+const useGetRestaurants = (): getRestaurantHook => {
+  const { Restaurants } =  useRestaurantStore() as getRestaurantHook;
 
   return {
     //getUsers,

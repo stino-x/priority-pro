@@ -15,6 +15,7 @@ export const authFormSchema = (type: string) => z.object({
   name: type === 'signin' ? z.string().optional() : z.string().min(3),
   email: z.string().email(),
   password: z.string().min(8),
+  restaurant: z.string().nonempty("Restaurant is required"),
 })
 
 export const taskFormSchema = () =>  z.object({
