@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Ellipsis, LogOut } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { getMenuList } from "@/lib/menu-list";
@@ -16,6 +16,7 @@ import {
   TooltipProvider
 } from "@/components/ui/tooltip";
 import useLogout from "@/lib/hooks/useLogout";
+import { useToast } from "@/hooks/use-toast";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -25,6 +26,8 @@ export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const {logout} = useLogout();
   const menuList = getMenuList(pathname);
+  const { toast } = useToast()
+  const router = useRouter()
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -106,35 +109,49 @@ export function Menu({ isOpen }: MenuProps) {
             </li>
           ))}
           <li className="w-full grow flex items-end">
-            <TooltipProvider disableHoverableContent>
-              <Tooltip delayDuration={100}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => {
-                      logout();
-                    }}
-                    variant="outline"
-                    className="w-full justify-center h-10 mt-5"
-                  >
-                    <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      <LogOut size={18} />
-                    </span>
-                    <p
-                      className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                      )}
-                    >
-                      Sign out
-                    </p>
-                  </Button>
-                </TooltipTrigger>
-                {isOpen === false && (
-                  <TooltipContent side="right">Sign out</TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
-          </li>
+  <TooltipProvider disableHoverableContent>
+    <Tooltip delayDuration={100}>
+      <TooltipTrigger asChild>
+        <Button
+          onClick={async () => {
+            try {
+              await logout();
+              toast({
+                title: "Logged out successfully",
+                description: `${new Date().toLocaleString()}`,
+              });
+              router.push('/'); // Redirect to home page after successful logout
+            } catch (error) {
+              console.error("Logout failed:", error);
+              toast({
+                title: "Logout failed",
+                description: "Please try again.",
+                variant: "destructive", // This will style the toast as an error message
+              });
+            }
+          }}
+          variant="outline"
+          className="w-full justify-center h-10 mt-5"
+        >
+          <span className={cn(isOpen === false ? "" : "mr-4")}>
+            <LogOut size={18} />
+          </span>
+          <p
+            className={cn(
+              "whitespace-nowrap",
+              isOpen === false ? "opacity-0 hidden" : "opacity-100"
+            )}
+          >
+            Sign out
+          </p>
+        </Button>
+      </TooltipTrigger>
+      {isOpen === false && (
+        <TooltipContent side="right">Sign out</TooltipContent>
+      )}
+    </Tooltip>
+  </TooltipProvider>
+</li>
           {/* <li>
             //LANGUAGE TOGGLE
           </li> */}

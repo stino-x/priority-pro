@@ -3,63 +3,55 @@
 import { Databases, Users, Client, Account } from "node-appwrite";
 import { cookies } from "next/headers";
 
+// Define a single instance of the Client object
+let sessionClient: Client | null = null;
+let adminClient: Client | null = null;
+
+// Function to create or return the session client (reused)
 async function createSessionClient() {
-  const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-    .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!);
+  // Only create the session client if it hasn't been instantiated already
+  if (!sessionClient) {
+    sessionClient = new Client()
+      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+      .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!);
+  }
 
-    const session = cookies().get("appwrite-session");
+  const session = cookies().get("appwrite-session");
 
-    if (!session || !session.value) {
-      throw new Error("No session");
-    }
+  if (!session || !session.value) {
+    throw new Error("No session");
+  }
 
-  client.setSession(session.value);
+  sessionClient.setSession(session.value);
 
   return {
     get account() {
-      return new Account(client);
+      return new Account(sessionClient!);
     },
   };
 }
 
+// Function to create or return the admin client (reused)
 async function createAdminClient() {
-  const client = new Client()
-    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-    .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!)
-    .setKey(process.env.NEXT_PUBLIC_API_KEY!);
+  // Only create the admin client if it hasn't been instantiated already
+  if (!adminClient) {
+    adminClient = new Client()
+      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+      .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!)
+      .setKey(process.env.NEXT_PUBLIC_API_KEY!);
+  }
 
   return {
     get account() {
-      return new Account(client);
+      return new Account(adminClient!);
     },
     get database() {
-      return new Databases(client);
+      return new Databases(adminClient!);
     },
     get user() {
-      return new Users(client);
-    }
+      return new Users(adminClient!);
+    },
   };
 }
-
-// async function clientSideAccount() {
-//   const client = new Client()
-//     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? '')
-//     .setProject(process.env.NEXT_PUBLIC_PROJECT_ID ?? '');
-//     .setKey(process.env.NEXT_APPWRITE_KEY!);
-
-//   return new Account(client);
-// }
-
-// export const handleOAuthLogin = async (provider: string, successUrl: string, failureUrl: string) => {
-//   try {
-//     const account = await clientSideAccount();
-//     const result = account.createOAuth2Session(provider, successUrl, failureUrl);
-//     return result;
-//   } catch (error) {
-//     console.error('OAuth Login Error', error);
-//     throw error;
-//   }
-// };
 
 export { createSessionClient, createAdminClient };

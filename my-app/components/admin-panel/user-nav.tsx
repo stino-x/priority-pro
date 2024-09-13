@@ -21,9 +21,30 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import useLogout from "@/lib/hooks/useLogout";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from 'next/navigation'
 
 export function UserNav() {
   const { logout } = useLogout()
+  const { toast } = useToast()
+  const router = useRouter()
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Logged out successfully",
+        description: `${new Date().toLocaleString()}`,
+      });
+      router.push('/'); // Redirect to home page after successful logout
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast({
+        title: "Logout failed",
+        description: "Please try again.",
+        variant: "destructive", // This will style the toast as an error message
+      });
+    }
+  };
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -76,12 +97,16 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {
-          logout();
-        }}>
-          <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
-          Sign out
-        </DropdownMenuItem>
+        <DropdownMenuItem 
+        className="hover:cursor-pointer" 
+        onSelect={(event) => {
+          event.preventDefault();
+          handleLogout();
+        }}
+      >
+        <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
+        Sign out
+      </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
