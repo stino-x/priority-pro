@@ -1,36 +1,34 @@
-import { NextResponse } from 'next/server';
-import { Client, Account } from 'appwrite';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-const client = new Client();
-client
-.setEndpoint(`${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}`) // Use environment variable for endpoint
-.setProject(`${process.env.NEXT_PUBLIC_PROJECT_ID}`); // Use environment variable for project ID
+export function middleware(request: NextRequest) {
+  // Log the path for debugging purposes
+  console.log('Middleware executing for path:', request.nextUrl.pathname)
 
-async function isAuthenticated(req: any) {
-    const account = new Account(client);
-    try {
-        // Check if the user is authenticated by checking the session
-        await account.get();
-        return true;
-    } catch (error) {
-        // User is not authenticated
-        return false;
-    }
+  // Example: Check if the user is accessing an admin route
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    // Here you would typically check for authentication
+    // For now, we'll just log it and allow the request to continue
+    console.log('Admin route accessed')
+
+    // If you need to redirect, you can do it like this:
+    // return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Allow the request to continue
+  return NextResponse.next()
 }
 
-export async function middleware(req: any) {
-    const isAuth = await isAuthenticated(req);
-
-    if (!isAuth) {
-        // Redirect to the login page if the user is not authenticated
-        return NextResponse.redirect(new URL('/signin', req.url));
-    }
-
-    // If authenticated, continue with the request
-    return NextResponse.next();
-}
-
-// Apply the middleware to protected routes
+// Optional: Configure middleware to run only for specific paths
 export const config = {
-    matcher: ['/:path*', '!/signin', '!/signup', '!/public/:path*'], // Exclude certain routes
-};
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+}

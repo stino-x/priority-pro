@@ -81,7 +81,9 @@ const AuthForm = ({ type }: { type: string }) => {
 
           <CustomInput control={form.control} name='password' label="Password" placeholder='Enter your password' />
 
-          <CustomInput
+          {type === 'register' && (
+            <>
+            <CustomInput
             control={form.control}
             name="restaurant"
             label="your restaurant name"
@@ -91,6 +93,8 @@ const AuthForm = ({ type }: { type: string }) => {
               value: restaurant.$id,
             }))}
           />
+            </>
+          )}
 
           <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
             {isLoading ? 'Loading...' : (type === 'signin' ? 'Sign In' : 'Register')}
