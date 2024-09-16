@@ -10,7 +10,7 @@ import { Form } from "@/components/ui/form"
 import CustomInput from './CustomInput';
 import { useRouter } from 'next/navigation';
 import { authFormSchema } from '@/lib/utils';
-import { register, signIn, handleOAuthLogin } from '@/lib/actions/user.action';
+import { register, signIn, handleOAuthLogin, getAccount } from '@/lib/actions/user.action';
 import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
 
 const AuthForm = ({ type }: { type: string }) => {
@@ -20,6 +20,7 @@ const AuthForm = ({ type }: { type: string }) => {
 
   const formSchema = authFormSchema(type)
   const restaurants = useGetRestaurants();
+  const database = getAccount();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,6 +31,10 @@ const AuthForm = ({ type }: { type: string }) => {
       restaurant: "",
     },
   })
+
+  const onSubmitTwo = () => {
+    console.log(database)
+  }
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -102,7 +107,7 @@ const AuthForm = ({ type }: { type: string }) => {
         </form>
       </Form>
 
-      <Button type="button" onClick={handleGoogleLogin} className="mt-4 w-[80vw] sm:w-[40vw]">
+      <Button type="button" onClick={onSubmitTwo} className="mt-4 w-[80vw] sm:w-[40vw]">
         Login with Google
       </Button>
 

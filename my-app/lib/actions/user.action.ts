@@ -10,6 +10,7 @@ import { headers } from "next/headers";
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
   NEXT_PUBLIC_USER_COLLECTION_ID: USER_COLLECTION_ID,
+  NEXT_PUBLIC_RESTAURANT_COLLECTION_ID: RESTAURANT_COLLECTION_ID,
 } = process.env;
 
 interface SignUpParams {
@@ -148,3 +149,19 @@ export const logoutAccount = async () => {
     return null;
   }
 }
+
+// ---------- THIS IS THE FUNCTION, CHECK THE AUTHFORM FILE IN COMPONENTS THEN CLICK ON THE SIGNIN WITH GOOGLE BUTTON TO LOG IT OUT IN THE CONSOLE ----------
+
+// export const getAccount = async () => { 
+//   try {
+//     const { database } = await createAdminClient();
+//     const restaurants = await database.listDocuments(
+//       DATABASE_ID!,
+//       RESTAURANT_COLLECTION_ID!);
+
+//     return parseStringify(restaurants);
+//   } catch (error) {
+//     console.error("Error fetching the Appwrite database:", error);
+//     return null;
+//   }
+// };
