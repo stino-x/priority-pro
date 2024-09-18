@@ -150,18 +150,16 @@ export const logoutAccount = async () => {
   }
 }
 
-// ---------- THIS IS THE FUNCTION, CHECK THE AUTHFORM FILE IN COMPONENTS THEN CLICK ON THE SIGNIN WITH GOOGLE BUTTON TO LOG IT OUT IN THE CONSOLE ----------
+export const getAccount = async () => { 
+  try {
+    const { database } = await createAdminClient();
+    const restaurants = await database.listDocuments(
+      DATABASE_ID!,
+      RESTAURANT_COLLECTION_ID!);
 
-// export const getAccount = async () => { 
-//   try {
-//     const { database } = await createAdminClient();
-//     const restaurants = await database.listDocuments(
-//       DATABASE_ID!,
-//       RESTAURANT_COLLECTION_ID!);
-
-//     return parseStringify(restaurants);
-//   } catch (error) {
-//     console.error("Error fetching the Appwrite database:", error);
-//     return null;
-//   }
-// };
+    return parseStringify(restaurants.documents);
+  } catch (error) {
+    console.error("Error fetching the Appwrite database:", error);
+    return null;
+  }
+};

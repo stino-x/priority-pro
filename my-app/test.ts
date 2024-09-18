@@ -1,46 +1,36 @@
-// Zustand store
-import { create } from "zustand";
+import { useEffect, useState } from 'react';
+import { getAccount } from './path_to_getAccount_function'; // Import the getAccount function
 
-// Zustand store definition
-const useStore = create((set) => ({
-  bears: 0,
-  restaurants: [], // Add restaurants to the store
-  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
-  removeAllBears: () => set({ bears: 0 }),
-  updateBears: (newBears) => set({ bears: newBears })),
-  setRestaurants: (newRestaurants) => set({ restaurants: newRestaurants }), // Action to update restaurants
-}));
+const RestaurantsList = () => {
+  const [restaurants, setRestaurants] = useState([]);
 
-// Function to get restaurants from Appwrite database and update the Zustand store
-import { createAdminClient } from "./appwrite"; // Assuming appwrite.ts is in the same directory
-import { parseStringify } from "../../lib/utils"; // Assuming parseStringify is in the utils directory
+  // Fetch restaurants when the component mounts
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      const data = await getAccount(); // Call the function to get restaurant data
+      if (data) {
+        setRestaurants(data); // Update the state with the restaurant data
+      }
+    };
 
-const {
-  NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
-  NEXT_PUBLIC_RESTAURANT_COLLECTION_ID: RESTAURANT_COLLECTION_ID,
-} = process.env;
+    fetchRestaurants();
+  }, []);
 
-export const getAccount = async () => {
-  try {
-    // Get the admin client which includes the database
-    const { database } = await createAdminClient();
-
-    // Fetch all restaurant documents from the Appwrite database
-    const restaurants = await database.listDocuments(
-      DATABASE_ID!,
-      RESTAURANT_COLLECTION_ID!
-    );
-
-    // Parse the response to ensure it's JSON compatible
-    const parsedRestaurants = parseStringify(restaurants);
-
-    // Update Zustand store with fetched restaurants
-    const { setRestaurants } = useStore.getState(); // Access Zustand's action to set restaurants
-    setRestaurants(parsedRestaurants.documents); // Pass the documents to update the store
-
-    return parsedRestaurants; // Return restaurants as well
-  } catch (error) {
-    console.error("Error fetching the Appwrite database:", error);
-    return null;
-  }
+  return (
+    <div>
+      <h1>Restaurants List</h1>
+      {restaurants.length > 0 ? (
+        restaurants.map((restaurant) => (
+          <div key={restaurant.$id}>
+            <h2>{restaurant.name}</h2>
+            <p>{restaurant.description}</p>
+          </div>
+        ))
+      ) : (
+        <p>No restaurants available.</p>
+      )}
+    </div>
+  );
 };
+
+export default RestaurantsList;

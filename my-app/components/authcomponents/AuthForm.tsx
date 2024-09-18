@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from 'next/link'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -17,10 +17,20 @@ const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [restaurants, setRestaurants] = useState([]);
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      const data = await getAccount();
+      if (data) {
+        setRestaurants(data);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
 
   const formSchema = authFormSchema(type)
-  const restaurants = useGetRestaurants();
-  const database = getAccount();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -31,10 +41,6 @@ const AuthForm = ({ type }: { type: string }) => {
       restaurant: "",
     },
   })
-
-  const onSubmitTwo = () => {
-    console.log(database)
-  }
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -92,8 +98,8 @@ const AuthForm = ({ type }: { type: string }) => {
             control={form.control}
             name="restaurant"
             label="your restaurant name"
-            isDropdown // Indicating it's a dropdown
-            options={restaurants.Restaurants.map((restaurant: any) => ({
+            isDropdown
+            options={restaurants.map((restaurant: any) => ({
               label: restaurant.name,
               value: restaurant.$id,
             }))}
@@ -107,7 +113,7 @@ const AuthForm = ({ type }: { type: string }) => {
         </form>
       </Form>
 
-      <Button type="button" onClick={onSubmitTwo} className="mt-4 w-[80vw] sm:w-[40vw]">
+      <Button type="button" onClick={handleGoogleLogin} className="mt-4 w-[80vw] sm:w-[40vw]">
         Login with Google
       </Button>
 
