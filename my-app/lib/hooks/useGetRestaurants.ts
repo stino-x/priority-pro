@@ -1,18 +1,23 @@
+'use client'
+import { useEffect } from "react";
+import { Restaurant } from "../interfaces/interface";
 import useRestaurantStore from "../store/useGetRestrauntStore";
 
 interface getRestaurantHook {
-  Restaurants: Array<any>; 
-    //getUsers: () => Promise<void>;
+  restaurants: Restaurant[]; // Updated to use the Restaurant interface
+  fetchRestaurants: () => void; // Add getRestaurants method
 }
   
 
 const useGetRestaurants = (): getRestaurantHook => {
-  const { Restaurants } =  useRestaurantStore() as getRestaurantHook;
+  const { restaurants, fetchRestaurants } = useRestaurantStore() as getRestaurantHook;
 
-  return {
-    //getUsers,
-    Restaurants
-  };
+  useEffect(() => {
+    fetchRestaurants(); // Fetch restaurants when the component mounts
+  }, [fetchRestaurants]);
+
+  return { restaurants, fetchRestaurants };
 };
+
 
 export default useGetRestaurants;

@@ -150,7 +150,7 @@ export const logoutAccount = async () => {
   }
 }
 
-export const getAccount = async () => { 
+export const getRestaurants = async () => { 
   try {
     const { database } = await createAdminClient();
     const restaurants = await database.listDocuments(

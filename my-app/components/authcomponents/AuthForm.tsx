@@ -10,25 +10,16 @@ import { Form } from "@/components/ui/form"
 import CustomInput from './CustomInput';
 import { useRouter } from 'next/navigation';
 import { authFormSchema } from '@/lib/utils';
-import { register, signIn, handleOAuthLogin, getAccount } from '@/lib/actions/user.action';
+import { register, signIn, handleOAuthLogin } from '@/lib/actions/user.action';
 import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
+import { Restaurant } from "@/lib/interfaces/interface";
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [restaurants, setRestaurants] = useState([]);
 
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      const data = await getAccount();
-      if (data) {
-        setRestaurants(data);
-      }
-    };
-
-    fetchRestaurants();
-  }, []);
+  const { restaurants } = useGetRestaurants();
 
   const formSchema = authFormSchema(type)
 
