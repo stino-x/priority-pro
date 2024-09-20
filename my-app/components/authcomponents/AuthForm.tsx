@@ -1,24 +1,22 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from 'next/link'
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react";
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import CustomInput from './CustomInput';
-import { useRouter } from 'next/navigation';
 import { authFormSchema } from '@/lib/utils';
 import { register, signIn, handleOAuthLogin } from '@/lib/actions/user.action';
 import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
-import { Restaurant } from "@/lib/interfaces/interface";
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
-  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [error, setError] = useState<string | null>(null);
   const { restaurants } = useGetRestaurants();
 
   const formSchema = authFormSchema(type)
@@ -35,8 +33,11 @@ const AuthForm = ({ type }: { type: string }) => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
+    setError(null);
 
     try {
+      console.log(`Attempting ${type}...`);
+      
       if(type === 'register') {
         const userData = {
           name: data.name!,
@@ -45,28 +46,38 @@ const AuthForm = ({ type }: { type: string }) => {
           restaurant: data.restaurant
         }
 
+        console.log('Register data:', userData);
         const newUser = await register(userData);
-        setUser(newUser);
+        console.log('Register response:', newUser);
         if(newUser) router.push('/');
       }
 
       if(type === 'signin') {
-        const userData = await signIn({
+        const userData = {
           email: data.email,
           password: data.password,
-        })
+        }
 
-        if(userData) router.push('/');
+        console.log('Sign in data:', userData);
+        const signInResult = await signIn(userData);
+        console.log('Sign in response:', signInResult);
+        if(signInResult) router.push('/');
       }
     } catch (error) {
-      console.error(error);
+      console.error(`Error during ${type}:`, error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
   }
 
   const handleGoogleLogin = async () => {
-    await handleOAuthLogin();
+    try {
+      await handleOAuthLogin();
+    } catch (error) {
+      console.error('Error during Google login:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred during Google login');
+    }
   }
 
   return (
@@ -74,29 +85,26 @@ const AuthForm = ({ type }: { type: string }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-[80vw] sm:w-[40vw] rounded shadow-md shadow-slate-950 p-12 bg-[#fff]">
           {type === 'register' && (
-            <>
-              <CustomInput control={form.control} name='name' label="Full Name" placeholder='Enter your full name' />
-            </>
+            <CustomInput control={form.control} name='name' label="Full Name" placeholder='Enter your full name' />
           )}
 
           <CustomInput control={form.control} name='email' label="Email" placeholder='Enter your email' />
-
           <CustomInput control={form.control} name='password' label="Password" placeholder='Enter your password' />
 
           {type === 'register' && (
-            <>
             <CustomInput
-            control={form.control}
-            name="restaurant"
-            label="your restaurant name"
-            isDropdown
-            options={restaurants.map((restaurant: any) => ({
-              label: restaurant.name,
-              value: restaurant.$id,
-            }))}
-          />
-            </>
+              control={form.control}
+              name="restaurant"
+              label="your restaurant name"
+              isDropdown
+              options={restaurants.map((restaurant: any) => ({
+                label: restaurant.name,
+                value: restaurant.$id,
+              }))}
+            />
           )}
+
+          {error && <p className="text-red-500 mt-2">{error}</p>}
 
           <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
             {isLoading ? 'Loading...' : (type === 'signin' ? 'Sign In' : 'Register')}

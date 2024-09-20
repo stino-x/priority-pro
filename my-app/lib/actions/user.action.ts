@@ -46,6 +46,7 @@ export const getUserInfo = async ({ userId }: getUserInfoProps) => {
 }
 
 export const signIn = async ({ email, password }: SignInParams) => {
+  console.log('signIn function called', { email, password });
   try {
     const { account } = await createAdminClient();
     const session = await account.createEmailPasswordSession(email, password);
@@ -58,6 +59,7 @@ export const signIn = async ({ email, password }: SignInParams) => {
     });
 
     console.log(session)
+    console.log('Sign-in successful');
     const user = await getUserInfo({ userId: session.$id })
 
     return parseStringify(user);
