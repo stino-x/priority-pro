@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from "react-hook-form"
@@ -10,14 +10,31 @@ import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import CustomInput from './CustomInput';
 import { authFormSchema } from '@/lib/utils';
-import { register, signIn, handleOAuthLogin } from '@/lib/actions/user.action';
+import { register, signIn, handleOAuthLogin, getLoggedInUser } from '@/lib/actions/user.action';
 import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState(null);
   const { restaurants } = useGetRestaurants();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await getLoggedInUser();
+        if (userData) {
+          setUser(userData);
+          router.push('/');
+        }
+      } catch (error) {
+        console.error('Failed to fetch logged-in user:', error);
+      }
+    };
+
+    fetchUser();
+  }, [router]);
 
   const formSchema = authFormSchema(type)
 
@@ -36,8 +53,6 @@ const AuthForm = ({ type }: { type: string }) => {
     setError(null);
 
     try {
-      console.log(`Attempting ${type}...`);
-      
       if(type === 'register') {
         const userData = {
           name: data.name!,
@@ -46,9 +61,7 @@ const AuthForm = ({ type }: { type: string }) => {
           restaurant: data.restaurant
         }
 
-        console.log('Register data:', userData);
         const newUser = await register(userData);
-        console.log('Register response:', newUser);
         if(newUser) router.push('/');
       }
 
@@ -58,9 +71,7 @@ const AuthForm = ({ type }: { type: string }) => {
           password: data.password,
         }
 
-        console.log('Sign in data:', userData);
         const signInResult = await signIn(userData);
-        console.log('Sign in response:', signInResult);
         if(signInResult) router.push('/');
       }
     } catch (error) {

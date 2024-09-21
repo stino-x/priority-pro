@@ -3,13 +3,10 @@
 import { Databases, Users, Client, Account } from "node-appwrite";
 import { cookies } from "next/headers";
 
-// Define a single instance of the Client object
 let sessionClient: Client | null = null;
 let adminClient: Client | null = null;
 
-// Function to create or return the session client (reused)
 async function createSessionClient() {
-  // Only create the session client if it hasn't been instantiated already
   if (!sessionClient) {
     sessionClient = new Client()
       .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
@@ -31,9 +28,7 @@ async function createSessionClient() {
   };
 }
 
-// Function to create or return the admin client (reused)
 async function createAdminClient() {
-  // Only create the admin client if it hasn't been instantiated already
   if (!adminClient) {
     adminClient = new Client()
       .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)

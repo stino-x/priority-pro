@@ -26,17 +26,17 @@ interface SignInParams {
 }
 
 interface getUserInfoProps {
-  userId: string,
+  userid: string,
 }
 
-export const getUserInfo = async ({ userId }: getUserInfoProps) => {
+export const getUserInfo = async ({ userid }: getUserInfoProps) => {
   try {
     const { database } = await createAdminClient();
 
     const user = await database.listDocuments(
       DATABASE_ID!,
       USER_COLLECTION_ID!,
-      [Query.equal('userid', [userId])]
+      [Query.equal('userid', [userid])]
     )
 
     return parseStringify(user.documents[0]);
@@ -46,7 +46,6 @@ export const getUserInfo = async ({ userId }: getUserInfoProps) => {
 }
 
 export const signIn = async ({ email, password }: SignInParams) => {
-  console.log('signIn function called', { email, password });
   try {
     const { account } = await createAdminClient();
     const session = await account.createEmailPasswordSession(email, password);
@@ -58,9 +57,7 @@ export const signIn = async ({ email, password }: SignInParams) => {
       secure: true,
     });
 
-    console.log(session)
-    console.log('Sign-in successful');
-    const user = await getUserInfo({ userId: session.$id })
+    const user = await getUserInfo({ userid: session.userId })
 
     return parseStringify(user);
   } catch (error) {
@@ -96,7 +93,6 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
     );
 
     const session = await account.createEmailPasswordSession(email, password);
-    console.log(session);
 
     cookies().set("appwrite-session", session.secret, {
       path: "/",
@@ -116,7 +112,7 @@ export const getLoggedInUser = async () => {
     const { account } = await createSessionClient();
     const result = await account.get();
 
-    const user = await getUserInfo({ userId: result.$id})
+    const user = await getUserInfo({ userid: result.$id})
 
     return parseStringify(user);
   } catch (error) {
