@@ -1,16 +1,21 @@
+import { useEffect } from "react";
 import useGetUsersStore from "../store/useGetUsersStore";
+import { User } from "../interfaces/interface";
 
-interface getUsersHook {
-    users: Array<any>; 
-    //getUsers: () => Promise<void>;
+interface GetUsersHook {
+    users: User[];
+    getUsers: () => Promise<void>;
 }
   
 
-const useGetUsers = (): getUsersHook => {
-  const { users } =  useGetUsersStore() as getUsersHook;
+const useGetUsers = (): GetUsersHook => {
+  const { users, getUsers } =  useGetUsersStore() as GetUsersHook;
+  useEffect(() => {
+    getUsers();
+  },  [getUsers]);
 
   return {
-    //getUsers,
+    getUsers,
     users
   };
 };

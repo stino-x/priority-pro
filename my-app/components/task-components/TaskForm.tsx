@@ -12,19 +12,17 @@ import { taskFormSchema } from "@/lib/utils";
 import CustomInput from "@/components/task-components/CustomInput";
 import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
 import useGetUsers from "@/lib/hooks/useGetUsers";
+import { User } from "@/lib/interfaces/interface";
 
-interface getUsersHook {
-  users: Array<any>; 
-  //getUsers: () => Promise<void>;
-}
+
 
 const TaskForm = () => {
   const router = useRouter();
-  const formSchema = taskFormSchema();
+  const formSchema = taskFormSchema;
   const [isLoading, setIsLoading] = useState(false);
 
-  const users = useGetUsers() as getUsersHook;
-  useGetRestaurants();
+  const { users } = useGetUsers()
+  //useGetRestaurants();
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,10 +87,10 @@ const TaskForm = () => {
             name="user"
             label="Assign to User"
             isDropdown // Indicating it's a dropdown
-            options={users.users.map((user: any) => ({
+            options={users.map((user: any) => ({
               label: user.name,
               value: user.$id,
-            }))}
+            })) || []}
           />
 
           {/* Submit Button */}

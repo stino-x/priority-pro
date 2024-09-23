@@ -29,11 +29,11 @@ export const authFormSchema = (type: string) => z.object({
     : z.string().optional(),
 });
 
-export const taskFormSchema = () =>  z.object({
+export const taskFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(5, "Description must be at least 5 characters"),
   priority: z.number().min(1).max(5, "Priority must be between 1 and 5"),
-  due_date: z.string().nonempty("Due date is required"),
-  user: z.string().nonempty("User is required"),
-//   restaurant: z.string().nonempty("Restaurant is required"),
+  due_date: z.string().min(1, "Due date is required"),
+  user: z.string().min(1, "User is required"),
+  restaurant: z.string().min(1, "Restaurant is required"),
 });
