@@ -5,7 +5,7 @@ import { Control, FieldPath } from 'react-hook-form';
 import { z } from 'zod';
 import { taskFormSchema } from '@/lib/utils';
 
-const formSchema = taskFormSchema();
+const formSchema = taskFormSchema;
 
 interface CustomInputProps {
   control: Control<z.infer<typeof formSchema>>;
