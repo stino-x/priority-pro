@@ -21,28 +21,21 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "due_date",
     header: "Due date",
     cell: ({ row }) => (
-      <div className="text-center text-blue-600">{row.original.due_date}</div>
+      <div className="">{row.original.due_date}</div>
     ),
   },
   {
     accessorKey: "assignee",
     header: "Assignee",
     cell: ({ row }) => (
-      <div className="text-left px-2 text-gray-800">{row.original.assignee}</div>
+      <div className="text-center w-12 h-12 bg-[#F5F2F0] rounded-full">{row.original.assignee}</div>
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div
-        className={`text-center font-bold ${
-          row.original.status === "Completed"
-            ? "text-green-500"
-            : row.original.status === "In Progress"
-            ? "text-yellow-500"
-            : "text-red-500"
-        }`}
+      <div className="text-center px-2 bg-[#F5F2F0] rounded-4"
       >
         {row.original.status}
       </div>
