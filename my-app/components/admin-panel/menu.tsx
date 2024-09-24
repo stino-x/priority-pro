@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from 'react';
 import { Ellipsis, LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import useLogout from "@/lib/hooks/useLogout";
 import { useToast } from "@/hooks/use-toast";
+import { getLoggedInUser } from "@/lib/actions/user.action";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -25,9 +27,26 @@ interface MenuProps {
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const {logout} = useLogout();
-  const menuList = getMenuList(pathname);
   const { toast } = useToast()
-  const router = useRouter()
+  const router = useRouter();
+  const [canAssignTasks, setCanAssignTasks] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await getLoggedInUser();
+
+        const { can_assign_tasks } = userData;
+        setCanAssignTasks(can_assign_tasks);
+      } catch (err) {
+        console.error("Failed to fetch user data:", err);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const menuList = getMenuList(pathname, canAssignTasks);
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
