@@ -1,31 +1,45 @@
-const onSubmit = async (data: z.infer<typeof formSchema>) => {
-  setIsLoading(true);
-  
+export const createTasks = async (task: CreateTasksProps) => {
   try {
-    const task = {
-      title: data.title,
-      description: data.description,
-      priority: data.priority,
-      due_date: data.due_date,
-    };
-    
-    // Log the task data to be sent
-    console.log('Submitting task data:', task);
+    const { database } = await createAdminClient();
 
-    // Make sure to await the createTasks call
-    const newTask = await createTasks(task);
+    const currentUser = await getLoggedInUser();
+    const { userid } = currentUser;
+    const restaurantId = currentUser.restaurant.$id;
 
-    if (newTask) {
-      console.log('Task created successfully');
-      form.reset();
-      router.push("/");
-    } else {
-      console.error('Failed to create task');
-    }
+    // Fetch existing tasks to determine the next taskId
+    const tasks = await database.listDocuments(
+      DATABASE_ID!,
+      TASKS_COLLECTION_ID!,
+      [Query.equal('restaurant', restaurantId)]
+    );
+
+    // Find the max taskId to determine the next taskId
+    const maxTaskId = tasks.documents.reduce(
+      (maxId, currentTask) => Math.max(maxId, currentTask.taskId || 0),
+      0
+    );
+
+    // Set the new taskId as maxTaskId + 1
+    const newTaskId = maxTaskId + 1;
+
+    // Create a new task with the determined taskId
+    const newTask = await database.createDocument(
+      DATABASE_ID!,
+      TASKS_COLLECTION_ID!,
+      ID.unique(),
+      {
+        ...task,
+        taskId: newTaskId,
+        is_verified: false,
+        restaurant: restaurantId,
+        assigned_by: userid,
+      }
+    );
+
+    console.log('Task created successfully:', newTask);
+
+    return parseStringify(newTask);
   } catch (error) {
     console.error('Error creating task:', error);
-    // Display an error notification (if any notification library is used)
-  } finally {
-    setIsLoading(false);
   }
 };

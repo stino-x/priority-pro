@@ -10,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
+import TasksTable from "@/components/TasksTable";
 
 export default function CalendarPage() {
   return (
@@ -27,7 +28,7 @@ export default function CalendarPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <PlaceholderContent />
+      <TasksTable />
     </ContentLayout>
     //progress bars
     //newlyassigend

@@ -13,7 +13,7 @@ import CustomInput from "@/components/task-components/CustomInput";
 import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
 import useGetUsers from "@/lib/hooks/useGetUsers";
 import { User } from "@/lib/interfaces/interface";
-import { createTasks } from "@/lib/actions/restaurant.action";
+import { createTasks } from "@/lib/actions/task.action";
 
 
 
