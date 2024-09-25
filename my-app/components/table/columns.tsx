@@ -28,14 +28,14 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "assignee",
     header: "Assignee",
     cell: ({ row }) => (
-      <div className="text-center w-12 h-12 bg-[#F5F2F0] rounded-full">{row.original.assignee}</div>
+      <div className="text-center w-12 h-12 bg-[#F5F2F0] rounded-full pt-[8]">{row.original.assignee}</div>
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="text-center px-2 bg-[#F5F2F0] rounded-4"
+      <div className="text-center px-2 bg-[#F5F2F0] rounded-8"
       >
         {row.original.status}
       </div>
