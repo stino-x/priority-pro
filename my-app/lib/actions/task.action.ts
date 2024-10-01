@@ -1,8 +1,8 @@
 'use server';
 
-import { createAdminClient } from "../appwrite";
+import { createAdminClient, createSessionClient } from "../appwrite";
 import { ID, Query } from "node-appwrite";
-import { parseStringify } from "../utils";
+import { parseStringify, taskFormSchema } from "../utils";
 import { getLoggedInUser } from "./user.action";
 
 const {
@@ -20,46 +20,71 @@ interface CreateTasksProps {
   user: string
 }
 
-export const createTasks = async (task: CreateTasksProps) => {
+export async function createTask(data: any) {
   try {
+    const parsedData = taskFormSchema.parse(data);
+
     const { database } = await createAdminClient();
+    const { account } = await createSessionClient();
 
-    const currentUser = await getLoggedInUser();
-    const { userid } = currentUser;
-    const restaurantId = currentUser.restaurant.$id;
+    // Get the current user
+    const currentUser = await account.get();
+    const userId = currentUser.$id;
 
-    const tasks = await database.listDocuments(
+    if (!userId) {
+      throw new Error('User ID is missing');
+    }
+
+    // Query the database to find the restaurant associated with the user
+    const restaurantQuery = await database.listDocuments(
       DATABASE_ID!,
-      TASKS_COLLECTION_ID!,
-      [Query.equal('restaurant', restaurantId)]
+      USER_COLLECTION_ID!,
+      [Query.equal('$id', parsedData.user)]
     );
 
-    const maxTaskId = tasks.documents.reduce(
-      (maxId, currentTask) => Math.max(maxId, currentTask.taskId || 0),
-      0
-    );
+    if (restaurantQuery.documents.length === 0) {
+      throw new Error('User not found or has no associated restaurant');
+    }
 
-    const newTaskId = maxTaskId + 1;
-    console.log(newTaskId)
+    const restaurantId = restaurantQuery.documents[0].restaurant.$id;
 
-    const newTask = await database.createDocument(
+    // Create the task
+    const createdTask = await database.createDocument(
       DATABASE_ID!,
       TASKS_COLLECTION_ID!,
       ID.unique(),
       {
-        ...task,
-        id: newTaskId,
-        is_verified: false,
+        title: parsedData.title,
+        description: parsedData.description,
+        priority: parsedData.priority,
+        user: parsedData.user,
         restaurant: restaurantId,
-        assigned_by: userid
+        due_date: parsedData.due_date,
+        created_at: new Date().toISOString(),
+        is_verified: false,
+        assigned_by: userId
       }
-    )
+    );
 
-    console.log('Task created successfully:', newTask);
+    const taskId = createdTask.$id;
 
-    return parseStringify(newTask)
+    // Update user's assigned tasks
+    const userDocument = restaurantQuery.documents[0];
+    const assignedTasks = userDocument.assigned_tasks || [];
+
+    await database.updateDocument(
+     DATABASE_ID!,
+      USER_COLLECTION_ID!,
+      parsedData.user,
+      {
+        assigned_tasks: [...assignedTasks, taskId],
+      }
+    );
+
+    return createdTask;
   } catch (error) {
     console.error('Error creating task:', error);
+    throw new Error('Failed to create task');
   }
 }
 

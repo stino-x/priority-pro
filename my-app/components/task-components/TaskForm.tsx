@@ -13,7 +13,7 @@ import CustomInput from "@/components/task-components/CustomInput";
 import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
 import useGetUsers from "@/lib/hooks/useGetUsers";
 import { User } from "@/lib/interfaces/interface";
-import { createTasks } from "@/lib/actions/task.action";
+//import { createTasks } from "@/lib/actions/task.action";
 
 
 
@@ -43,6 +43,7 @@ const TaskForm = () => {
     setIsLoading(true);
   
     try {
+      // Prepare task data
       const task = {
         title: data.title,
         description: data.description,
@@ -50,14 +51,28 @@ const TaskForm = () => {
         due_date: data.due_date,
         created_at: data.created_at,
         user: data.user
-      }
-
-      const newTask = createTasks(task);
-
-      if (await newTask) {
-        console.log('Task created successfully');
+      };
+  
+      // Make the request to the /api/tasks endpoint
+      const response = await fetch('/api/tasks/createtasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(task),
+      });
+  
+      // Check if the task was created successfully
+      if (response.ok) {
+        const newTask = await response.json();
+        console.log('Task created successfully:', newTask);
+  
+        // Reset the form and navigate back to the main page
         form.reset();
-        router.push("/");
+        router.push('/');
+      } else {
+        const errorData = await response.json();
+        console.error('Error creating task:', errorData.message);
       }
     } catch (error) {
       console.error('Error creating task:', error);
@@ -65,6 +80,7 @@ const TaskForm = () => {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <main className="w-full h-full flex flex-col justify-center items-center">
