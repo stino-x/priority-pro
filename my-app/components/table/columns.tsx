@@ -3,18 +3,18 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 export type Payment = {
-  task: number
+  title: string
   due_date: string
-  assignee: string
-  status:  "Not Started" | "In Progress" | "Completed"
+  priority: number
+  status:  boolean
 }
 
 export const columns: ColumnDef<Payment>[] = [
   {
-    accessorKey: "task",
-    header: "Task",
+    accessorKey: "title",
+    header: "Title",
     cell: ({ row }) => (
-      <div className="text-left font-semibold">{row.original.task}</div>
+      <div className="text-left font-semibold">{row.original.title}</div>
     ),
   },
   {
@@ -25,20 +25,28 @@ export const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    accessorKey: "assignee",
-    header: "Assignee",
+    accessorKey: "priority",
+    header: "Priority",
     cell: ({ row }) => (
-      <div className="text-center w-12 h-12 bg-[#F5F2F0] rounded-full pt-[8]">{row.original.assignee}</div>
+      (row.original.priority < 3 ?
+        <div className="text-center w-12 h-12 bg-[rgb(225,66,66)] rounded-full text-2xl">{row.original.priority}</div>
+      : <div className="text-center w-12 h-12 bg-[#4bec3c] rounded-full text-2xl">{row.original.priority}</div>)
     ),
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="text-center px-2 bg-[#F5F2F0] rounded-8"
+      (row.original.status === true ? 
+        <div className="text-center px-2 bg-[#F5F2F0] rounded-8"
       >
-        {row.original.status}
+        Completed
       </div>
+      : <div className="text-center px-2 bg-[#F5F2F0] rounded-8"
+      >
+        Not Started
+      </div>)
+      
     ),
   },
 ]

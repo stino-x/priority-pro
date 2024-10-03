@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { DataTable } from "@/components/table/data-table";
 import { Payment, columns } from "@/components/table/columns"
-import { getData } from "./dommyData";
+import { getData } from "./data"
 
 export default async function CalendarPage() {
   const data = await getData();
@@ -36,7 +36,5 @@ export default async function CalendarPage() {
       </Breadcrumb>
       <DataTable columns={columns} data={data} />
     </ContentLayout>
-    //progress bars
-    //newlyassigend
   );
 }
