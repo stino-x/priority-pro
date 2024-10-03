@@ -10,9 +10,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
-import TasksTable from "@/components/TasksTable";
+import { DataTable } from "@/components/table/data-table";
+import { Payment, columns } from "@/components/table/columns"
+import { getData } from "./data"
 
-export default function CalendarPage() {
+export default async function CalendarPage() {
+  const data = await getData();
+
   return (
     <ContentLayout title="My Tasks">
       <Breadcrumb>
@@ -24,13 +28,13 @@ export default function CalendarPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>test</BreadcrumbPage>
+            <BreadcrumbPage>
+              My Tasks
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <TasksTable />
+      <DataTable columns={columns} data={data} />
     </ContentLayout>
-    //progress bars
-    //newlyassigend
   );
 }
