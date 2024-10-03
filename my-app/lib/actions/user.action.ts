@@ -6,10 +6,12 @@ import { parseStringify } from "../../lib/utils";
 import { createAdminClient, createSessionClient } from "../appwrite";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { User } from "../interfaces/interface";
 
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
   NEXT_PUBLIC_USER_COLLECTION_ID: USER_COLLECTION_ID,
+  NEXT_PUBLIC_RESTAURANT_COLLECTION_ID: RESTAURANT_COLLECTION_ID,
 } = process.env;
 
 interface SignUpParams {
@@ -25,17 +27,17 @@ interface SignInParams {
 }
 
 interface getUserInfoProps {
-  userId: string,
+  userid: string,
 }
 
-export const getUserInfo = async ({ userId }: getUserInfoProps) => {
+export const getUserInfo = async ({ userid }: getUserInfoProps) => {
   try {
     const { database } = await createAdminClient();
 
     const user = await database.listDocuments(
       DATABASE_ID!,
       USER_COLLECTION_ID!,
-      [Query.equal('userid', [userId])]
+      [Query.equal('userid', [userid])]
     )
 
     return parseStringify(user.documents[0]);
@@ -56,8 +58,7 @@ export const signIn = async ({ email, password }: SignInParams) => {
       secure: true,
     });
 
-    console.log(session)
-    const user = await getUserInfo({ userId: session.$id })
+    const user = await getUserInfo({ userid: session.userId })
 
     return parseStringify(user);
   } catch (error) {
@@ -93,7 +94,6 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
     );
 
     const session = await account.createEmailPasswordSession(email, password);
-    console.log(session);
 
     cookies().set("appwrite-session", session.secret, {
       path: "/",
@@ -113,7 +113,7 @@ export const getLoggedInUser = async () => {
     const { account } = await createSessionClient();
     const result = await account.get();
 
-    const user = await getUserInfo({ userId: result.$id})
+    const user = await getUserInfo({ userid: result.$id})
 
     return parseStringify(user);
   } catch (error) {
@@ -146,5 +146,52 @@ export const logoutAccount = async () => {
     await account.deleteSession('current');
   } catch (error) {
     return null;
+  }
+}
+
+export const getRestaurants = async () => { 
+  try {
+    const { database } = await createAdminClient();
+    const restaurants = await database.listDocuments(
+      DATABASE_ID!,
+      RESTAURANT_COLLECTION_ID!);
+
+    return parseStringify(restaurants.documents);
+  } catch (error) {
+    console.error("Error fetching the Appwrite database:", error);
+    return null;
+  }
+};
+
+export const fetchUsers = async (): Promise<User[]> => {
+  try {
+    const { database, account } = await createAdminClient();
+
+    const currentUser = await getLoggedInUser();
+    const {userid} = currentUser;
+
+    const user = await database.listDocuments(
+      `${process.env.NEXT_PUBLIC_DATABASE_ID}`,
+      `${process.env.NEXT_PUBLIC_USER_COLLECTION_ID}`,
+      [Query.equal('userid', userid)]
+    );
+
+    if (user.documents.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const restaurantId = user.documents[0].restaurant.$id;
+
+    const users = await database.listDocuments(
+      `${process.env.NEXT_PUBLIC_DATABASE_ID}`,
+      `${process.env.NEXT_PUBLIC_USER_COLLECTION_ID}`,
+      [Query.equal('restaurant', restaurantId)]
+    );
+
+    return parseStringify(users.documents) as User[];
+
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
   }
 }
