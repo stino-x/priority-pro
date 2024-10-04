@@ -1,12 +1,3 @@
-"use client"
-
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-
 import {
   Table,
   TableBody,
@@ -15,69 +6,55 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import PaginationTable from "./pagination"
+import { cn, formatDateTime } from '@/lib/utils';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-}
-
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  })
+const DataTable = ({ tasks }: TasksProps) => {
 
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader className="bg-[#f9fafb]">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id} className="px-2">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
+          <TableRow>
+            <TableHead className="px-2">Title</TableHead>
+            <TableHead className="px-2">Due date</TableHead>
+            <TableHead className="px-2">Status</TableHead>
+            <TableHead className="px-2">Priority</TableHead>
+            {/* <TableHead className="px-2 max-md:hidden">Channel</TableHead>
+            <TableHead className="px-2 max-md:hidden">Category</TableHead> */}
+          </TableRow>
         </TableHeader>
+
+
         <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="px-2">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          <TableRow>
+            {tasks.map((t: Task) => {
+              return (
+                <TableHeader key={t.task_id}>
+                  <TableCell className="max-w-[250px] pl-2 pr-10">
+                    <div className="flex items-center">
+                      <h1>{t.title}</h1>
+                    </div>
                   </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
+
+                  <TableCell className="pl-2 pr-10 min-w-32">
+                    {t.due_date}
+                  </TableCell>
+
+                  <TableCell className="pl-2 pr-10">
+                    {t.status}
+                  </TableCell>
+
+                  <TableCell className="pl-2 pr-10 capitalize min-w-24">
+                    {t.priority}
+                  </TableCell>
+                </TableHeader>
+              )
+            })}
+          </TableRow>
         </TableBody>
       </Table>
-
-      <PaginationTable />
     </div>
   )
 }
+
+export default DataTable

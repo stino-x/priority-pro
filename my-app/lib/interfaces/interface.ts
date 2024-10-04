@@ -42,7 +42,8 @@ export interface Task {
   task_id: string;                    // Required, string
   title: string;                      // Required, string
   description: string;                // Required, string
-  priority: number;                   // Required, integer
+  priority: number;  
+  status: string;                // Required, integer
   
   // Relationships
   restaurant: Restaurant;             // Relationship with Restaurant
