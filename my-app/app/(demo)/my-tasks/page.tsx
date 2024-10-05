@@ -28,7 +28,7 @@ export default async function MyTasks({ searchParams: {id, page }}: SearchParamP
   //console.log(accountsData)
   const appwriteItemId = (id as string) || accountsData?.appwriteItemId;
 
-  const rowsPerPage = 7;
+  const rowsPerPage = 5;
   const totalPages = Math.ceil(task?.documents.length / rowsPerPage);
 
   const indexOfLastTransaction = currentPage * rowsPerPage;
