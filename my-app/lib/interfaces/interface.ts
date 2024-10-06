@@ -54,7 +54,8 @@ export interface Task {
   
   is_verified: boolean;               // Required, boolean, default is false
   verified_by?: string;               // Optional, string (userId of the verifier)
-  verified_at?: Date;                 // Optional, datetime (when the task was verified)
+  verified_at?: Date;
+  completed: boolean;                 // Optional, datetime (when the task was verified)
   
   is_reassigned: boolean;             // Required, boolean
   previous_assignee_id?: string;      // Optional, string (userId of the previous assignee)

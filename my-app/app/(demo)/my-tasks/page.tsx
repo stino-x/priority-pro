@@ -11,14 +11,18 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { DataTable } from "@/components/table/data-table";
-import { Payment, columns } from "@/components/table/columns"
+import {  columns } from "@/components/table/columns"
 import { getData } from "./data"
+import Tasktabs from "@/components/task-components/Tasktabs";
+import { FilteredTasks } from "@/components/task-components/FilteredTasks";
 
 export default async function CalendarPage() {
-  const data = await getData();
+  // const data = await getData();
+  const data = FilteredTasks();
 
   return (
     <ContentLayout title="My Tasks">
+      <Tasktabs />
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
