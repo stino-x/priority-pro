@@ -16,8 +16,11 @@ import { getData } from "./data"
 import { getLoggedInUser } from "@/lib/actions/user.action";
 import PaginationTable from "@/components/table/pagination";
 import DataTable from "@/components/table/data-table";
+import Tasktabs from "@/components/task-components/Tasktabs";
+import { FilteredTasks } from "@/components/task-components/FilteredTasks";
 
 export default async function MyTasks({ searchParams: {id, page }}: SearchParamProps) {
+  const data = FilteredTasks();
   const currentPage = Number(page as string) || 1;
   const loggedIn = await getLoggedInUser();
   const task = await getTasks();
@@ -39,6 +42,7 @@ export default async function MyTasks({ searchParams: {id, page }}: SearchParamP
 
   return (
     <ContentLayout title="My Tasks">
+      <Tasktabs />
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

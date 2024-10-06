@@ -1,15 +1,16 @@
 "use client"
 
+import { Task } from "@/lib/interfaces/interface"
 import { ColumnDef } from "@tanstack/react-table"
 
-export type Payment = {
-  title: string
-  due_date: string
-  priority: number
-  status:  boolean
-}
+// export type Payment = {
+//   title: string
+//   due_date: string
+//   priority: number
+//   status:  boolean
+// }
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "title",
     header: "Title",
@@ -21,7 +22,7 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "due_date",
     header: "Due date",
     cell: ({ row }) => (
-      <div className="">{row.original.due_date}</div>
+      <div className="">{row.original.due_date.toLocaleDateString()}</div>
     ),
   },
   {
@@ -37,7 +38,7 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      (row.original.status === true ? 
+      (row.original.is_verified === true ? 
         <div className="text-center px-2 bg-[#F5F2F0] rounded-8"
       >
         Completed
