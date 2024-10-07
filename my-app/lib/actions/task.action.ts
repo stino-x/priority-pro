@@ -89,7 +89,36 @@ export async function createTask(data: any) {
   }
 }
 
-export const getTasks = async () => {
+export const getMyTasks = async () => {
+  try {
+    const { database } = await createAdminClient();
+
+    const currentUser = await getLoggedInUser();
+    const { $id } = currentUser;
+
+    const fetchTasks = await database.listDocuments(
+      DATABASE_ID!,
+      TASKS_COLLECTION_ID!,
+      [Query.equal('user', $id)]
+    )
+
+    //console.log(currentUser)
+
+    const tasks = {
+      documents: [
+        ...fetchTasks.documents.reverse()
+      ]
+    }
+
+    //console.log(tasks)
+
+    return parseStringify(tasks);
+  } catch (error) {
+    console.error('Failed to fetch tasks', error)
+  }
+}
+
+export const getAllTasks = async () => {
   try {
     const { database } = await createAdminClient();
 

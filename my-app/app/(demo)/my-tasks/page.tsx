@@ -11,7 +11,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
-import { getTasks } from "@/lib/actions/task.action";
+import { getMyTasks } from "@/lib/actions/task.action";
 // import { Payment, columns } from "@/components/table/columns"
 import { getData } from "./data"
 import { getLoggedInUser } from "@/lib/actions/user.action";
@@ -24,7 +24,7 @@ export default async function MyTasks({ searchParams: {id, page }}: SearchParamP
   // const task = getFilteredTasks(activeTab);
   const currentPage = Number(page as string) || 1;
   const loggedIn = await getLoggedInUser();
-  const task = await getTasks();
+  const task = await getMyTasks();
   //console.log(task.reverse());
 
   if(!task) return;
