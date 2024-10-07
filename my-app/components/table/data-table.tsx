@@ -65,7 +65,7 @@ const DataTable = ({ tasks }: TasksProps) => {
 
               <TableCell className="pl-2 pr-10">
                 <div className={`text-center px-2 rounded-8 ${t.is_verified ? "bg-green-100" : "bg-gray-100"}`}>
-                  {t.is_verified ? "Completed" : "Not Started"}
+                  {t.completed ? "Completed" : "Not Started"}
                 </div>
               </TableCell>
 
