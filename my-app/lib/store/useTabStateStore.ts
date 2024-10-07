@@ -6,7 +6,7 @@ type TabState = {
 }
 
 const useTabStateStore = create<TabState>((set) => ({
-  activeTab: '',
+  activeTab: 'All',
   setActiveTab: (tab) => set({ activeTab: tab }),
 }))
 

@@ -1,3 +1,7 @@
+// DataTable.tsx
+'use client'; // Ensure this component is a client component
+
+import React from 'react';
 import { 
   Table,
   TableBody,
@@ -6,21 +10,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDateTime } from '@/lib/utils';
-
-interface Task {
-  task_id: string;
-  title: string;
-  due_date: string;
-  status: boolean;
-  priority: number;
-}
+import { Task } from "@/lib/interfaces/interface";
+import useTabState from "@/lib/hooks/useTabState"; // Import your tab state hook
 
 interface TasksProps {
   tasks: Task[];
 }
 
 const DataTable = ({ tasks }: TasksProps) => {
+  const { activeTab } = useTabState(); // Access Zustand state here
+
+  // Filter tasks based on activeTab
+  const filteredTasks = tasks.filter(task => {
+    switch (activeTab) {
+      case 'All':
+        return true;
+      case 'Verified':
+        return task.is_verified === true;
+      case 'Completed':
+        return task.completed === true;
+      case 'Overdue':
+        const dueDate = new Date(task.due_date);
+        const today = new Date();
+        return dueDate < today;
+      default:
+        return true;
+    }
+  });
+
   return (
     <div className="rounded-md border mt-4">
       <Table>
@@ -34,7 +51,7 @@ const DataTable = ({ tasks }: TasksProps) => {
         </TableHeader>
 
         <TableBody>
-          {tasks.map((t: Task) => (
+          {filteredTasks.map((t: Task) => (
             <TableRow key={t.task_id} className="!hover:bg-none !border-b-default">
               <TableCell className="max-w-[250px] pl-2 pr-10">
                 <div className="flex items-center">
@@ -43,12 +60,12 @@ const DataTable = ({ tasks }: TasksProps) => {
               </TableCell>
 
               <TableCell className="pl-2 pr-10 min-w-32">
-                {t.due_date}
+                {new Date(t.due_date).toLocaleDateString()} {/* Ensure due_date is properly formatted */}
               </TableCell>
 
               <TableCell className="pl-2 pr-10">
-                <div className={`text-center px-2 rounded-8 ${t.status ? "bg-green-100" : "bg-gray-100"}`}>
-                  {t.status ? "Completed" : "Not Started"}
+                <div className={`text-center px-2 rounded-8 ${t.is_verified ? "bg-green-100" : "bg-gray-100"}`}>
+                  {t.is_verified ? "Completed" : "Not Started"}
                 </div>
               </TableCell>
 

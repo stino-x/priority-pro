@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 import PlaceholderContent from "@/components/demo/placeholder-content";
@@ -11,16 +12,16 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { getTasks } from "@/lib/actions/task.action";
-import { Payment, columns } from "@/components/table/columns"
+// import { Payment, columns } from "@/components/table/columns"
 import { getData } from "./data"
 import { getLoggedInUser } from "@/lib/actions/user.action";
 import PaginationTable from "@/components/table/pagination";
 import DataTable from "@/components/table/data-table";
 import Tasktabs from "@/components/task-components/Tasktabs";
-import { FilteredTasks } from "@/components/task-components/FilteredTasks";
 
 export default async function MyTasks({ searchParams: {id, page }}: SearchParamProps) {
-  const data = FilteredTasks();
+  // const { activeTab } = useTabState();
+  // const task = getFilteredTasks(activeTab);
   const currentPage = Number(page as string) || 1;
   const loggedIn = await getLoggedInUser();
   const task = await getTasks();

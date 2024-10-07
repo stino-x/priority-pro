@@ -4,6 +4,7 @@ import { createAdminClient, createSessionClient } from "../appwrite";
 import { ID, Query } from "node-appwrite";
 import { parseStringify, taskFormSchema } from "../utils";
 import { getLoggedInUser } from "./user.action";
+import { Task } from "../interfaces/interface";
 
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
@@ -108,3 +109,31 @@ export const getTasks = async () => {
     console.error('Failed to fetch tasks', error)
   }
 }
+
+// export const filterTasks = (tasks: Task[], activeTab: string): Task[] => {
+//   return tasks.filter(task => {
+//     switch (activeTab) {
+//       case 'All':
+//         return true;
+//       case 'Verified':
+//         return task.is_verified === true;
+//       case 'Completed':
+//         return task.completed === true;
+//       case 'Overdue':
+//         const dueDate = new Date(task.due_date);
+//         const today = new Date();
+//         return dueDate < today;
+//       default:
+//         return true;
+//     }
+//   });
+// };
+
+// export const getFilteredTasks = async (activeTab: string): Promise<Task[]> => {
+//   // Import getData here to avoid circular dependencies
+//   const { getData } = await import('@/app/(demo)/my-tasks/data');
+//   const allTasks = await getData();
+//   return filterTasks(allTasks, activeTab);
+// };
+
+

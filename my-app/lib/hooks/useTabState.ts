@@ -1,3 +1,5 @@
+'use client'
+
 import useTabStateStore from "../store/useTabStateStore"
 
 
