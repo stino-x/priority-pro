@@ -25,6 +25,7 @@ export default async function MyTasks({ searchParams: {id, page }}: SearchParamP
   const currentPage = Number(page as string) || 1;
   const loggedIn = await getLoggedInUser();
   const task = await getTasks();
+  //console.log(task.reverse());
 
   if(!task) return;
 
@@ -39,7 +40,6 @@ export default async function MyTasks({ searchParams: {id, page }}: SearchParamP
   const indexOfFirstTransaction = indexOfLastTransaction - rowsPerPage;
 
   const currentTasks = task?.documents.slice(indexOfFirstTransaction, indexOfLastTransaction);
-
 
   return (
     <ContentLayout title="My Tasks">

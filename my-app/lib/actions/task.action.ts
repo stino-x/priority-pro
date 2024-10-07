@@ -100,7 +100,7 @@ export const getTasks = async () => {
 
     const tasks = {
       documents: [
-        ...fetchTasks.documents
+        ...fetchTasks.documents.reverse()
       ]
     }
 
