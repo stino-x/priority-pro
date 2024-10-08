@@ -11,9 +11,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
-import { getMyTasks } from "@/lib/actions/task.action";
+import { getVerifiedTasks } from "@/lib/actions/task.action";
 // import { Payment, columns } from "@/components/table/columns"
-import { getData } from "./data"
 import { getLoggedInUser } from "@/lib/actions/user.action";
 import PaginationTable from "@/components/table/pagination";
 import DataTable from "@/components/table/data-table";
@@ -24,7 +23,7 @@ export default async function MyTasks({ searchParams: {id, page }}: SearchParamP
   // const task = getFilteredTasks(activeTab);
   const currentPage = Number(page as string) || 1;
   const loggedIn = await getLoggedInUser();
-  const task = await getMyTasks();
+  const task = await getVerifiedTasks();
   //console.log(task.reverse());
 
   if(!task) return;
@@ -54,12 +53,11 @@ export default async function MyTasks({ searchParams: {id, page }}: SearchParamP
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>
-              My Tasks
+              Verified Tasks
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Tasktabs />
       <DataTable tasks={currentTasks} />
         {totalPages > 1 && (
           <div className="my-4 w-full">

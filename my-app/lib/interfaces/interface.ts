@@ -42,7 +42,8 @@ export interface Task {
   task_id: string;                    // Required, string
   title: string;                      // Required, string
   description: string;                // Required, string
-  priority: number;                   // Required, integer
+  priority: number;  
+  status: string;                // Required, integer
   
   // Relationships
   restaurant: Restaurant;             // Relationship with Restaurant
@@ -54,7 +55,8 @@ export interface Task {
   
   is_verified: boolean;               // Required, boolean, default is false
   verified_by?: string;               // Optional, string (userId of the verifier)
-  verified_at?: Date;                 // Optional, datetime (when the task was verified)
+  verified_at?: Date;
+  completed: boolean;                 // Optional, datetime (when the task was verified)
   
   is_reassigned: boolean;             // Required, boolean
   previous_assignee_id?: string;      // Optional, string (userId of the previous assignee)
