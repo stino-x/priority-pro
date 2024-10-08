@@ -139,6 +139,32 @@ export const getAllTasks = async () => {
   }
 }
 
+export const getVerifiedTasks = async () => {
+  try {
+    const { database } = await createAdminClient();
+
+    const fetchTasks = await database.listDocuments(
+      DATABASE_ID!,
+      TASKS_COLLECTION_ID!,
+      [Query.equal('is_verified', true)]
+    )
+
+    //console.log(currentUser)
+
+    const tasks = {
+      documents: [
+        ...fetchTasks.documents.reverse()
+      ]
+    }
+
+    //console.log(tasks)
+
+    return parseStringify(tasks);
+  } catch (error) {
+    console.error('Failed to fetch tasks', error)
+  }
+}
+
 // export const filterTasks = (tasks: Task[], activeTab: string): Task[] => {
 //   return tasks.filter(task => {
 //     switch (activeTab) {
