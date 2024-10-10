@@ -14,7 +14,7 @@ import {
 export default function DashboardPage() {
   return (
     <ContentLayout title="Dashboard">
-      <Breadcrumb>
+      {/* <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
@@ -27,7 +27,10 @@ export default function DashboardPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <PlaceholderContent />
+      <PlaceholderContent /> */}
+      <>
+      
+      </>
     </ContentLayout>
     //progress bars
     //newlyassigend
