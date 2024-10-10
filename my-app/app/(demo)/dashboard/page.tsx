@@ -24,7 +24,10 @@ export default function DashboardPage() {
   return (
     <ContentLayout title="Dashboard">
       <div>
-        <h2>Hi, {currentUser ? currentUser.name : 'Loading...'}<br /></h2>
+        <h2 className="font-light text-xl">Hi,</h2>
+        <h1 className="font-semibold text-2xl"> {currentUser ? currentUser.name : 'Loading...'}</h1>
+
+        <div className="w-[80vw] bg-slate-100 h-[12rem]"></div>
       </div>
     </ContentLayout>
   );
