@@ -74,7 +74,7 @@ export async function createTask(data: any) {
     const assignedTasks = userDocument.assigned_tasks || [];
 
     await database.updateDocument(
-     DATABASE_ID!,
+      DATABASE_ID!,
       USER_COLLECTION_ID!,
       parsedData.user,
       {
@@ -157,13 +157,50 @@ export const getVerifiedTasks = async () => {
       ]
     }
 
-    //console.log(tasks)
+    // console.log(tasks)
 
     return parseStringify(tasks);
   } catch (error) {
     console.error('Failed to fetch tasks', error)
   }
 }
+
+export const getCurrentDate = (): string => {
+    const now = new Date();
+  
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}`;
+  };
+  
+  
+  export const getDailyTasks = async () => {
+    try {
+      const { database } = await createAdminClient();
+  
+      const date = await getCurrentDate();
+  
+      const fetchTasks = await database.listDocuments(
+        DATABASE_ID!,
+        TASKS_COLLECTION_ID!,
+        [Query.equal('due_date', date)]
+      )
+  
+      const tasks = {
+        documents: [
+          ...fetchTasks.documents.reverse()
+        ]
+      }
+  
+      console.log(tasks)
+  
+      return parseStringify(tasks);
+    } catch (error) {
+      console.error('Failed to fetch tasks', error)
+    }
+  }
 
 // export const filterTasks = (tasks: Task[], activeTab: string): Task[] => {
 //   return tasks.filter(task => {
