@@ -196,7 +196,7 @@ export const getCurrentDate = (): string => {
   
       console.log(tasks)
   
-      return parseStringify(tasks);
+      return parseStringify(tasks.documents);
     } catch (error) {
       console.error('Failed to fetch tasks', error)
     }
