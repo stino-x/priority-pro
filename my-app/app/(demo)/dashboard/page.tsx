@@ -27,7 +27,7 @@ export default function DashboardPage() {
         <h2 className="font-light text-xl">Hi,</h2>
         <h1 className="font-semibold text-2xl"> {currentUser ? currentUser.name : 'Loading...'}</h1>
 
-        <div className="w-[80vw] bg-slate-100 h-[12rem]"></div>
+        <div className="w-[80vw] bg-slate-100 h-[12rem] dark:bg-red-300"></div>
       </div>
     </ContentLayout>
   );
