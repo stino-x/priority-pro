@@ -61,12 +61,12 @@ export default function DashboardPage() {
             {task.length > 0 ? (
               task.map((t: Task) => (
                 <div key={t.task_id} className="w-[80%] h-[4rem] bg-[#D3E0EA] dark:bg-[#404258] rounded-xl">
-                  <h3 className={`text-center px-2 rounded-8 ${t.completed ? "bg-green-100" : "bg-gray-100"}`}>
+                  <h3 className={`text-center w-[3rem] rounded-8 ${t.completed ? "bg-green-100" : "bg-gray-100"}`}>
                   {t.completed ? "Completed" : "Not Started"}
                   </h3>
                   <h2>{t.title}</h2>
                   <div>
-                    <h4 className={`text-center px-2 rounded-8 ${t.is_verified ? "bg-green-100" : "bg-gray-100"}`}>
+                    <h4 className={`text-center w-[3rem] rounded-8 ${t.is_verified ? "bg-green-100" : "bg-gray-100"}`}>
                       {t.is_verified ? "Verified" : "Not Verified"}
                     </h4>
                     <h4>Since {t.verified_at ? new Date(t.verified_at).toLocaleDateString() : 'N/A'}</h4>
