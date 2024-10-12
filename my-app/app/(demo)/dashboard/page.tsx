@@ -60,16 +60,16 @@ export default function DashboardPage() {
           <div className="flex flex-col w-[100%] justify-around mt-4">
             {task.length > 0 ? (
               task.map((t: Task) => (
-                <div key={t.task_id} className="w-[80%] h-[4rem] bg-[#D3E0EA] dark:bg-[#404258] rounded-xl">
-                  <h3 className={`text-center w-[3rem] rounded-8 ${t.completed ? "bg-green-100" : "bg-gray-100"}`}>
+                <div key={t.task_id} className={`pl-4 py-2 w-[100%] h-[5rem] bg-[#D3E0EA] dark:bg-[#404258] rounded-xl border-l-8 ${t.completed ? "border-green-100" : "border-red-400"}`}>
+                  <h3 className={`text-center w-[5rem] rounded-2xl font-semibold text-xs text-[#26262f] dark:text-[#d9d9d9] ${t.completed ? "bg-green-100" : "bg-red-400"}`}>
                   {t.completed ? "Completed" : "Not Started"}
                   </h3>
                   <h2>{t.title}</h2>
-                  <div>
-                    <h4 className={`text-center w-[3rem] rounded-8 ${t.is_verified ? "bg-green-100" : "bg-gray-100"}`}>
+                  <div className="flex flex-row justify-between mt-2">
+                    <h4 className="font-semibold text-xs">{t.verified_at ? new Date(t.verified_at).toLocaleDateString() : 'N/A'}</h4>
+                    <h4 className={`pb-0 text-center w-[5rem] rounded-2xl font-semibold text-xs text-[#26262f] dark:text-[#26262f] ${t.is_verified ? "bg-green-100" : "bg-gray-100"}`}>
                       {t.is_verified ? "Verified" : "Not Verified"}
                     </h4>
-                    <h4>Since {t.verified_at ? new Date(t.verified_at).toLocaleDateString() : 'N/A'}</h4>
                   </div>
                   
                 </div>
