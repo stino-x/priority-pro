@@ -68,7 +68,7 @@ export default function DashboardPage() {
 
         <div className="w-[80vw] bg-slate-100 h-[12rem] dark:bg-red-300"></div>
         <div className="flex flex-col items-center w-full mt-8">
-          <h1>All Tasks</h1>
+          <h1>Todays Tasks</h1>
           <div className="flex flex-row w-[100%] justify-around">
             <div className="w-[35vw] h-[7rem] bg-[#D3E0EA] dark:bg-[#404258] rounded-xl flex flex-col justify-center items-center">
               <MessageCircleMore className="w-[3rem] h-[3rem] text-[#ffadff]" />
