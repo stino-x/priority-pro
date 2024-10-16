@@ -1,4 +1,5 @@
 declare type Task = {
+  $id: string;
   task_id: string;
   title: string;
   status: string;

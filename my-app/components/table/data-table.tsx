@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Task } from "@/lib/interfaces/interface";
 import useTabState from "@/lib/hooks/useTabState"; // Import your tab state hook
+import Link from 'next/link'
 
 interface TasksProps {
   tasks: Task[];
@@ -52,32 +53,35 @@ const DataTable = ({ tasks }: TasksProps) => {
 
         <TableBody>
           {filteredTasks.map((t: Task) => (
-            <TableRow key={t.task_id} className="!hover:bg-none !border-b-default">
-              <TableCell className="max-w-[250px] pl-2 pr-10">
-                <div className="flex items-center">
-                  <h1>{t.title}</h1>
-                </div>
-              </TableCell>
+            <Link href={`tasks/${t.$id}`} key={t.task_id}>
+              <TableRow className="!hover:bg-none !border-b-default">
+                <TableCell className="max-w-[250px] pl-2 pr-10">
+                  <div className="flex items-center">
+                    <h1>{t.title}</h1>
+                  </div>
+                </TableCell>
 
-              <TableCell className="pl-2 pr-10 min-w-32">
-                {new Date(t.due_date).toLocaleDateString()} {/* Ensure due_date is properly formatted */}
-              </TableCell>
+                <TableCell className="pl-2 pr-10 min-w-32">
+                  {new Date(t.due_date).toLocaleDateString()} {/* Ensure due_date is properly formatted */}
+                </TableCell>
 
-              <TableCell className="pl-2 pr-10">
-                <div className={`text-center px-2 rounded-8 ${t.completed ? "bg-green-100" : "bg-gray-100"}`}>
-                  {t.completed ? "Completed" : "Not Started"}
-                </div>
-              </TableCell>
+                <TableCell className="pl-2 pr-10">
+                  <div className={`text-center px-2 rounded-8 ${t.completed ? "bg-green-100" : "bg-gray-100"}`}>
+                    {t.completed ? "Completed" : "Not Started"}
+                  </div>
+                </TableCell>
 
-              <TableCell className="pl-2 pr-10 capitalize min-w-24">
-                <div 
-                  className={`text-center w-12 h-12 rounded-full text-xl flex items-center justify-center 
-                    ${t.priority < 33 ? "bg-red-500" : "bg-green-500"} text-white`}
-                >
-                  {t.priority}
-                </div>
-              </TableCell>
-            </TableRow>
+                <TableCell className="pl-2 pr-10 capitalize min-w-24">
+                  <div 
+                    className={`text-center w-12 h-12 rounded-full text-xl flex items-center justify-center 
+                      ${t.priority < 33 ? "bg-red-500" : "bg-green-500"} text-white`}
+                  >
+                    {t.priority}
+                  </div>
+                </TableCell>
+              </TableRow>
+            </Link>
+            
           ))}
         </TableBody>
       </Table>

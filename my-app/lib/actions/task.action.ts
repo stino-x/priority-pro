@@ -118,22 +118,23 @@ export const getMyTasks = async () => {
   }
 }
 
-export const getAllTasks = async () => {
+export const getTaskById = async ($id: string) => {
   try {
     const { database } = await createAdminClient();
 
     const fetchTasks = await database.listDocuments(
       DATABASE_ID!,
       TASKS_COLLECTION_ID!,
+      [Query.equal('$id', $id)]
     )
 
-    const tasks = {
-      documents: [
-        ...fetchTasks.documents.reverse()
-      ]
-    }
+    // const tasks = {
+    //   documents: [
+    //     ...fetchTasks.documents.reverse()
+    //   ]
+    // }
 
-    return parseStringify(tasks);
+    return parseStringify(fetchTasks.documents[0]);
   } catch (error) {
     console.error('Failed to fetch tasks', error)
   }
