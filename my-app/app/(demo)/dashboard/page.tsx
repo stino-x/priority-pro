@@ -66,7 +66,9 @@ export default function DashboardPage() {
         <h2 className="font-light text-xl text-[#26262f] dark:text-[#d9d9d9]">Hi,</h2>
         <h1 className="font-semibold text-2xl text-[#26262f] dark:text-[#d9d9d9]"> {currentUser ? currentUser.name : 'Loading...'}</h1>
 
-        <div className="w-[80vw] bg-slate-100 h-[12rem] dark:bg-red-300"></div>
+        <div className="w-[80vw] bg-slate-100 h-[12rem] dark:bg-red-300">
+          
+        </div>
         <div className="flex flex-col items-center w-full mt-8">
           <h1>Todays Tasks</h1>
           <div className="flex flex-row w-[100%] justify-around">
