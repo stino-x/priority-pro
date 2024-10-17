@@ -1,12 +1,12 @@
 // import { Payment } from "@/components/table/columns";
-import { getTasks } from "@/lib/actions/task.action";
+import { getMyTasks } from "@/lib/actions/task.action";
 import useTabState from "@/lib/hooks/useTabState";
 import { Task } from "@/lib/interfaces/interface";
 
 
 export async function getData(): Promise<Task[]> {
   try {
-    const tasksResponse = await getTasks();
+    const tasksResponse = await getMyTasks();
     console.log("Fetched tasks:", tasksResponse);
     
 

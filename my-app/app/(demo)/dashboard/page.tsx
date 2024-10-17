@@ -7,6 +7,7 @@ import { getLoggedInUser } from '@/lib/actions/user.action';
 import { getDailyTasks } from '@/lib/actions/task.action';
 import { Task } from "@/lib/interfaces/interface";
 import { MessageCircleMore } from 'lucide-react';
+import CardComponent from '@/components/dashboard/CardComponent';
 
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -66,9 +67,28 @@ export default function DashboardPage() {
         <h2 className="font-light text-xl text-[#26262f] dark:text-[#d9d9d9]">Hi,</h2>
         <h1 className="font-semibold text-2xl text-[#26262f] dark:text-[#d9d9d9]"> {currentUser ? currentUser.name : 'Loading...'}</h1>
 
-        <div className="w-[80vw] bg-slate-100 h-[12rem] dark:bg-red-300">
-          
+        <div className="grid w-full mb-8 h-[60vh] grid-cols-[60%_40%] grid-rows-[60%_30%_30%] gap-4  p-4 bg-slate-100 dark:bg-red-300">
+          {/* First card spans the entire first row (both columns) */}
+          <div className="col-span-2 row-span-1">
+            <CardComponent taskType="closeDeadline" />
+          </div>
+        
+          {/* Second card occupies the first column and second row */}
+          <div className="col-span-1 row-start-2 row-span-1">
+            <CardComponent taskType="activeManagers" />
+          </div>
+        
+          {/* Third card occupies the second column and spans the second and third rows */}
+          <div className="col-start-2 row-start-2 row-end-3">
+            <CardComponent taskType="passedDeadline" />
+          </div>
+        
+          {/* Fourth card occupies the first column and third row under the second card */}
+          <div className="col-span-1 row-start-3">
+            <CardComponent taskType="dropTask" />
+          </div>
         </div>
+
         <div className="flex flex-col items-center w-full mt-8">
           <h1>Todays Tasks</h1>
           <div className="flex flex-row w-[100%] justify-around">
