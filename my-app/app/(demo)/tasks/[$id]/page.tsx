@@ -79,7 +79,16 @@ export default async function TaskPage({ params: { $id } }: { params: { $id: str
               <p className="font-semibold text-xs text-zinc-500">{task.description}</p>
             </div>
           </div>
+          <h1 className="font-semibold text-lg text-zinc-900">Subtasks</h1>
+          {task.subtasks.map((subTask) => {
+            <h2>subTask.title</h2>
+          })}
+          <h1 className="font-semibold text-lg text-zinc-900">Chats</h1>
+          {task.comment.map((comment) => {
+            <h2>comment.title</h2>
+          })}
         </div>
+        <button type="button">Complete Task</button>
       </section>
     </ContentLayout>
   );
