@@ -40,6 +40,35 @@ export default async function TaskPage({ params: { $id } }: { params: { $id: str
       </Breadcrumb>
       <section>
         <div>
+        <h1 className="font-semibold text-lg text-zinc-900"> Restaurant Details</h1>
+          <ul className="flex flex-col sm:flex-row mb-4  sm:justify-around list-disc">
+            <li className="flex flex-row my-2">
+              <Dot className="w-8 h-8 mr-1" />
+              <div className="flex flex-col">
+                <h2 className="font-semibold text-xs text-zinc-900">Name</h2>
+                <p className="font-semibold text-xs text-zinc-500">{task.restaurant.name}</p>
+              </div>
+            </li>
+            <li className="flex flex-row my-2">
+              <Dot className="w-8 h-8 mr-1" />
+              <div className="flex flex-col">
+                <h2 className="font-semibold text-xs text-zinc-900">Location</h2>
+                <p className="font-semibold text-xs text-zinc-500">{task.restaurant.location}</p>
+              </div>
+              
+            </li>
+            <li className="flex flex-row my-2">
+              <Dot className="w-8 h-8 mr-1" />
+              <div className="flex flex-col">
+                <h2 className="font-semibold text-xs text-zinc-900">Manager</h2>
+                <p className="font-semibold text-xs text-zinc-500">{task.completed_at ? new Date(task.verified_at).toLocaleDateString() : 'N/A'}</p>
+
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h1 className="font-semibold text-lg text-zinc-900">Task Details</h1>
           <ul className="flex flex-col list-disc">
             <li className="flex flex-row my-2">
               <Dot className="w-8 h-8 mr-1" />
@@ -69,15 +98,33 @@ export default async function TaskPage({ params: { $id } }: { params: { $id: str
 
         </div>
         <div className="mt-4">
-          <h1 className="font-semibold text-lg text-zinc-900">Details</h1>
           <div className="flex flex-row mt-4">
-            <div className="bg-gray-100 w-[1.5rem] h-[1.5rem] rounded mr-4 items-center justify-center">
-              <CiCalendarDate />
+            <div className=" mr-4 items-center justify-center">
+              <p className="font-semibold text-xs text-zinc-500">Title: </p>
             </div>
             <div className="flex flex-col">
               <h2 className="font-semibold text-xs text-zinc-900">{task.title}</h2>
-              <p className="font-semibold text-xs text-zinc-500">{task.description}</p>
             </div>
+          </div>
+          <div className="flex flex-row mt-4">
+            <div className=" mr-4 items-center justify-center">
+              <p className="font-semibold text-xs text-zinc-500">Description: </p>
+            </div>
+            <div className="flex flex-col">
+              <h2 className="font-semibold text-xs text-zinc-900">{task.description}</h2>
+            </div>
+          </div>
+          <div className="flex flex-row mt-4">
+            <div className=" mr-4 items-center justify-center">
+              <p className="font-semibold text-xs text-zinc-500">Task Priority: </p>
+            </div>
+            <div className="flex flex-col">
+              <h2 className="font-semibold text-xs text-zinc-900">{task.priority}</h2>
+            </div>
+          </div>
+          <div className="flex flex-row mt-4">
+            <h2 className=" bg-gray-100 h-[1.5rem] rounded font-semibold text-xs text-zinc-900">{task.completed ? "Completed" : "Not Started"}</h2>
+            <h2 className="bg-gray-100 h-[1.5rem] rounded font-semibold text-xs text-zinc-900 ml-4">{task.is_verified ? "Verified" : "Not Verified"}</h2>
           </div>
           <h1 className="font-semibold text-lg text-zinc-900">Subtasks</h1>
           {task.subtasks.map((subTask) => {
