@@ -1,4 +1,3 @@
-// DataTable.tsx
 'use client'; // Ensure this component is a client component
 
 import React from 'react';
@@ -12,13 +11,15 @@ import {
 } from "@/components/ui/table";
 import { Task } from "@/lib/interfaces/interface";
 import useTabState from "@/lib/hooks/useTabState"; // Import your tab state hook
+import { useRouter } from 'next/navigation';
 
 interface TasksProps {
   tasks: Task[];
 }
 
 const DataTable = ({ tasks }: TasksProps) => {
-  const { activeTab } = useTabState(); // Access Zustand state here
+  const { activeTab } = useTabState();
+  const router = useRouter();
 
   // Filter tasks based on activeTab
   const filteredTasks = tasks.filter(task => {
@@ -38,6 +39,10 @@ const DataTable = ({ tasks }: TasksProps) => {
     }
   });
 
+  const handleRowClick = (taskId: string) => {
+    router.push(`/tasks/${taskId}`);
+  };
+
   return (
     <div className="rounded-md border mt-4">
       <Table>
@@ -52,10 +57,10 @@ const DataTable = ({ tasks }: TasksProps) => {
 
         <TableBody>
           {filteredTasks.map((t: Task) => (
-            <TableRow key={t.task_id} className="!hover:bg-none !border-b-default">
+            <TableRow key={t.task_id} className="!hover:bg-none !border-b-default" onClick={() => handleRowClick(t.$id)}>
               <TableCell className="max-w-[250px] pl-2 pr-10">
-                <div className="flex items-center">
-                  <h1>{t.title}</h1>
+                <div className="flex items-center text-blue-600 hover:underline">
+                  {t.title}
                 </div>
               </TableCell>
 
@@ -64,7 +69,7 @@ const DataTable = ({ tasks }: TasksProps) => {
               </TableCell>
 
               <TableCell className="pl-2 pr-10">
-                <div className={`text-center px-2 rounded-8 ${t.is_verified ? "bg-green-100" : "bg-gray-100"}`}>
+                <div className={`text-center px-2 rounded-8 ${t.completed ? "bg-green-100" : "bg-gray-100"}`}>
                   {t.completed ? "Completed" : "Not Started"}
                 </div>
               </TableCell>

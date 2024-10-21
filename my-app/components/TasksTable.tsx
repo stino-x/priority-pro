@@ -1,6 +1,6 @@
 'use client';
 
-import { getTasks } from "@/lib/actions/task.action";
+import { getMyTasks } from "@/lib/actions/task.action";
 import { useState, useEffect } from "react";
 
 const TasksTable = () => {
@@ -10,7 +10,7 @@ const TasksTable = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const tasksData = await getTasks();
+        const tasksData = await getMyTasks();
         console.log(tasksData.documents)
         setTasks(tasksData.documents);
       } catch (error) {

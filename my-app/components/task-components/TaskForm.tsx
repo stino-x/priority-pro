@@ -93,7 +93,7 @@ const TaskForm = () => {
 
           <CustomInput control={form.control} name="priority" label="Priority (1-5)" placeholder="Enter priority (1-5)" type="number" />
 
-          <CustomInput control={form.control} name="due_date" label="Due Date" type="datetime-local" />
+          <CustomInput control={form.control} name="due_date" label="Due Date" type="date" />
 
           <CustomInput
             control={form.control}

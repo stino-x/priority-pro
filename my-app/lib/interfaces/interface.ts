@@ -39,6 +39,7 @@ export interface User {
 }
 
 export interface Task {
+  $id: string;
   task_id: string;                    // Required, string
   title: string;                      // Required, string
   description: string;                // Required, string
