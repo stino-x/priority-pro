@@ -48,7 +48,7 @@ export const authFormSchema = (type: string) => z.object({
       .refine(
         (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
         'Only .jpg, .jpeg, .png and .webp files are accepted.'
-      )
+      ).optional()
     : z.instanceof(File).optional(), 
 });
 

@@ -70,27 +70,29 @@ export const signIn = async ({ email, password }: SignInParams) => {
 
 export const register = async ({ password, ...userData }: SignUpParams) => {
   const { email, name, picture } = userData;
-
   let newUserAccount;
+  let pictureId = null;
 
   try {
     const { account, database, storage } = await createAdminClient();
     
+    // Create user account first
     newUserAccount = await account.create(ID.unique(), email, password, name);
-
-
-    // ADD PICTURE TO BUCKET
-
-    if (!BUCKET_ID) {
-      throw new Error('BUCKET_ID is not defined');
-    }
-    const pictureresponse = await storage.createFile(BUCKET_ID, 'unique()', picture);
-
-
-    
 
     if (!newUserAccount) throw new Error('Error creating user');
 
+    // Only handle picture upload if a picture was provided
+    if (picture && BUCKET_ID) {
+      try {
+        const pictureResponse = await storage.createFile(BUCKET_ID, ID.unique(), picture);
+        pictureId = pictureResponse.$id;
+      } catch (uploadError) {
+        console.error('Error uploading picture:', uploadError);
+        // Continue with user creation even if picture upload fails
+      }
+    }
+
+    // Create user document with optional picture_id
     const newUser = await database.createDocument(
       DATABASE_ID!,
       USER_COLLECTION_ID!,
@@ -100,7 +102,7 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
         userid: newUserAccount.$id,
         name: newUserAccount.name,
         email: newUserAccount.email,
-        picture_id: pictureresponse.$id,
+        picture_id: pictureId, // Will be null if no picture was uploaded
         can_assign_tasks: false,
         assigned_tasks: [],
         created_at: new Date(newUserAccount.$createdAt).toISOString(),
@@ -120,6 +122,7 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
     return parseStringify(newUser);
   } catch (error) {
     console.error('Error during user registration:', error);
+    throw error; // Re-throw the error to handle it in the UI
   }
 };
 
