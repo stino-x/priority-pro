@@ -5,6 +5,9 @@ import { twMerge } from "tailwind-merge"
 import { z } from "zod";
 
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -39,6 +42,14 @@ export const authFormSchema = (type: string) => z.object({
   restaurant: type === 'register' 
     ? z.string().nonempty("Restaurant is required")
     : z.string().optional(),
+  picture: type === 'register'
+    ? z.instanceof(File)
+      .refine((file) => file.size <= MAX_FILE_SIZE, 'Max file size is 5MB.')
+      .refine(
+        (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
+        'Only .jpg, .jpeg, .png and .webp files are accepted.'
+      )
+    : z.instanceof(File).optional(), 
 });
 
 export const taskFormSchema = z.object({

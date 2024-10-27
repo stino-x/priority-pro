@@ -115,6 +115,29 @@ const AuthForm = ({ type }: { type: string }) => {
             />
           )}
 
+
+          {/* IMAGE UPLAOD */}
+
+
+          {type !== 'register' && (
+            // <CustomInput
+            //   control={form.control}
+            //   name="restaurant"
+            //   label="your restaurant name"
+            //   isDropdown
+            //   options={restaurants.map((restaurant: any) => ({
+            //     label: restaurant.name,
+            //     value: restaurant.$id,
+            //   }))}
+            // />
+            <CustomInput
+              control={form.control}
+              name="picture"
+              label="Picture"
+              isUploadFile={true}
+            />
+          )}
+
           {error && <p className="text-red-500 mt-2">{error}</p>}
 
           <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
