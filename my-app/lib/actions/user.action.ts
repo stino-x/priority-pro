@@ -12,7 +12,9 @@ const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
   NEXT_PUBLIC_USER_COLLECTION_ID: USER_COLLECTION_ID,
   NEXT_PUBLIC_RESTAURANT_COLLECTION_ID: RESTAURANT_COLLECTION_ID,
+  NEXT_PUBLIC_BUCKET_ID: BUCKET_ID,
 } = process.env;
+
 
 interface SignUpParams {
   email: string;
@@ -67,13 +69,25 @@ export const signIn = async ({ email, password }: SignInParams) => {
 };
 
 export const register = async ({ password, ...userData }: SignUpParams) => {
-  const { email, name } = userData;
+  const { email, name, picture } = userData;
 
   let newUserAccount;
 
   try {
-    const { account, database } = await createAdminClient();
+    const { account, database, storage } = await createAdminClient();
+    
     newUserAccount = await account.create(ID.unique(), email, password, name);
+
+
+    // ADD PICTURE TO BUCKET
+
+    if (!BUCKET_ID) {
+      throw new Error('BUCKET_ID is not defined');
+    }
+    const pictureresponse = await storage.createFile(BUCKET_ID, 'unique()', picture);
+
+
+    
 
     if (!newUserAccount) throw new Error('Error creating user');
 
@@ -86,6 +100,7 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
         userid: newUserAccount.$id,
         name: newUserAccount.name,
         email: newUserAccount.email,
+        picture_id: pictureresponse.$id,
         can_assign_tasks: false,
         assigned_tasks: [],
         created_at: new Date(newUserAccount.$createdAt).toISOString(),

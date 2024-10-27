@@ -58,7 +58,8 @@ const AuthForm = ({ type }: { type: string }) => {
           name: data.name!,
           email: data.email,
           password: data.password,
-          restaurant: data.restaurant
+          restaurant: data.restaurant,
+          picture: data.picture,
         }
 
         const newUser = await register(userData);
@@ -119,7 +120,7 @@ const AuthForm = ({ type }: { type: string }) => {
           {/* IMAGE UPLAOD */}
 
 
-          {type !== 'register' && (
+          {type === 'register' && (
             // <CustomInput
             //   control={form.control}
             //   name="restaurant"
