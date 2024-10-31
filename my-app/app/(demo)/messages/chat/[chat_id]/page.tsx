@@ -50,12 +50,15 @@ const ChatPage = ({ params: { chat_id } }: ChatPageProps) => {
   }, [chat_id]);
 
   useEffect(() => {
-    const unsubscribe = client.subscribe(
-      [`databases.${DATABASE_ID}.collections.${MESSAGE_COLLECTION_ID}.documents`],
-      (response: any) => {
-        if (response.events.includes('databases.*.collections.*.documents.*.create') &&
-            response.payload.chat_id === chat_id) {
-          setMessages((prevMessages) => [...prevMessages, response.payload]);
+    const channel = `databases.${DATABASE_ID}.collections.${MESSAGE_COLLECTION_ID}.documents`;
+
+    const unsubscribe = client.subscribe(channel, (response: any) => {
+      const eventType = response.events[0];
+      console.log(response)
+      const changedChat = response.payload;
+
+      if (eventType.includes('create')) {
+          setMessages((prevMessages) => [changedChat, ...prevMessages]);
         }
       }
     );
