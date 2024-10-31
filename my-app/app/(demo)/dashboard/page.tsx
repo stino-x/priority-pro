@@ -8,6 +8,7 @@ import { getDailyTasks } from '@/lib/actions/task.action';
 import { Task } from "@/lib/interfaces/interface";
 import { MessageCircleMore } from 'lucide-react';
 import CardComponent from '@/components/dashboard/CardComponent';
+import Link from 'next/link'
 
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -89,10 +90,10 @@ export default function DashboardPage() {
         <div className="flex flex-col items-center w-full mt-8">
           <h1>Todays Tasks</h1>
           <div className="flex flex-row w-[100%] justify-around">
-            <div className="w-[35vw] h-[7rem] bg-[#D3E0EA] dark:bg-[#404258] rounded-xl flex flex-col justify-center items-center">
+            <Link href="/messages" className="w-[35vw] h-[7rem] bg-[#D3E0EA] dark:bg-[#404258] rounded-xl flex flex-col justify-center items-center">
               <MessageCircleMore className="w-[3rem] h-[3rem] text-[#ffadff]" />
               <h2 className="font-semibold text-lg text-zinc-500">Chats</h2>
-            </div>
+            </Link>
             <div className="w-[35vw] h-[7rem] bg-[#D3E0EA] dark:bg-[#404258] rounded-xl flex flex-col justify-center items-center">
               <CircularProgressbar
                 minValue={0}
