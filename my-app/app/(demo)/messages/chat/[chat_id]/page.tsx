@@ -16,10 +16,6 @@ const ChatPage = ({ params: { chat_id } }: ChatPageProps) => {
   const [chat, setChat] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  console.log('ENDPOINT', ENDPOINT)
-  console.log('PROJECT_ID', PROJECT_ID)
-  console.log('DATABASE_ID', DATABASE_ID)
-
   const client = new Client()
     .setEndpoint('https://cloud.appwrite.io/v1')
     .setProject(PROJECT_ID!);
