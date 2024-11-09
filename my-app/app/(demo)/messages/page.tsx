@@ -57,7 +57,7 @@ export default function Messages() {
       ) : (
         <div className="flex flex-col items-center justify-center h-full">
           {chats.map((chat: Chat) => (
-            <Link href={`/messages/chat/${chat.chat_id}`} key={chat.chat_id}>
+            <Link href={`/chat/${chat.chat_id}`} key={chat.chat_id}>
               <div className="chat-title flex items-center space-x-2">
                 <h1>{chat.title}</h1>
               </div>

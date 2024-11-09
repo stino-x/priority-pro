@@ -34,6 +34,7 @@ declare type Chat = {
 };
 
 declare type MessageProps = {
+  $id: string;
   message_id: string;
   chat_id: string;
   sender_id: string;
