@@ -11,7 +11,8 @@ const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
   NEXT_PUBLIC_USER_COLLECTION_ID: USER_COLLECTION_ID,
   NEXT_PUBLIC_TASKS_COLLECTION_ID: TASKS_COLLECTION_ID,
-  NEXT_SEND_IN_BLUE_API_KEY: BREVO_API_KEY,
+  NEXT_PUBLIC_SEND_IN_BLUE_API_KEY: BREVO_API_KEY,
+  NEXT_PUBLIC_TEMPLATE_ID: TEMPLATE_ID,
 } = process.env;
 
 interface CreateTasksProps {
@@ -23,16 +24,15 @@ interface CreateTasksProps {
   user: string
 }
 
-export const sendEmail = async (recipientEmail: string, firstName: string, description: string, restaurant: string, address: string) => {
-  
-  const templateId = 1;  // Replace with your actual Brevo template ID
+export const sendEmail = async (recipientEmail: string, assignername: string, firstName: string, description: string, restaurant: string, address: string) => {
 
   const emailData = {
     sender: { email: 'your_email@example.com' },  // Replace with your sender email
     to: [{ email: recipientEmail }],  // Recipient email
-    templateId: templateId,  // Template ID for the email template
+    templateId: TEMPLATE_ID,  // Template ID for the email template
     params: {
       FIRSTNAME: firstName,  // Dynamic content for personalization
+      ASSIGNERNAME: assignername, 
       DESCRIPTION: description, //
       ADDRESS: address, //
       RESTAURANT: restaurant, //
@@ -64,7 +64,7 @@ export async function createTask(data: any) {
 
     // Get the current user
     const currentUser = await account.get();
-    const userId = currentUser.$id;
+    const userId = currentUser.$id; //id of assigner
 
     if (!userId) {
       throw new Error('User ID is missing');
@@ -104,15 +104,18 @@ export async function createTask(data: any) {
     // Send email after task is created
     if (createdTask) {
       // Pass required parameters to sendEmail
-      const userInfo = await getUserInfo(parsedData.user); // get user info using user ID
-      const Email = userInfo.email; // Ensure the email exists in user info
+      const userInfo = await getUserInfo(userId); // get user info using user ID
+      const assignername = userInfo.name
+      const recipient = await getUserInfo(parsedData.user);
+      const Email = recipient.email; // Ensure the email exists in user info
       const taskDescription = parsedData.description;
       const restaurantName = restaurantQuery.documents[0].restaurant.name; // Assuming the restaurant name is in the restaurant object
-      const userFirstName = restaurantQuery.documents[0].user.name; // Assuming first name is part of the user object
+      const userFirstName = recipient.name; // Assuming first name is part of the user object
 
       // Call the sendEmail function with dynamic content
       await sendEmail(
         Email,
+        assignername,
         userFirstName, // Use the user's first name
         taskDescription, // Pass task description
         restaurantName, // Pass restaurant name
