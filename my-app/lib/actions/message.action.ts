@@ -60,8 +60,6 @@ export async function getMessages(chatId: string): Promise<Messages[]> {
       (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
     );
 
-    console.log(sortedMessages);
-
     return sortedMessages.map(message => ({
       $id: message.$id,
       message_id: message.message_id,

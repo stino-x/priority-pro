@@ -3,10 +3,7 @@
 import { getChat } from '@/lib/actions/chat.action';
 import { getMessages, sendMessage } from '@/lib/actions/message.action';
 import { useEffect, useRef, useState } from 'react';
-
-const DATABASE_ID = process.env.NEXT_PUBLIC_DATABASE_ID;
-const MESSAGE_COLLECTION_ID = process.env.NEXT_PUBLIC_MESSAGE_COLLECTION_ID;
-const PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
+//import { useSocket } from '@/lib/socketClient';
 
 const ChatPage = ({ params: {chat_id} }:  ChatPageProps) => {
   const [loading, setLoading] = useState(false);
@@ -14,6 +11,48 @@ const ChatPage = ({ params: {chat_id} }:  ChatPageProps) => {
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const [chat, setChat] = useState<Chat | null>(null);
+
+  const wsRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    const connectWebSocket = () => {
+      wsRef.current = new WebSocket("https://socket-prioprity-pro.onrender.com");
+
+      wsRef.current.onopen = () => {
+        console.log('WebSocket connected');
+      };
+
+      wsRef.current.onmessage = (event) => {
+        try {
+          const messageData = JSON.parse(event.data);
+          if (messageData.type === 'message') {
+            setMessages(prev => [...prev, messageData.data]);
+            console.log('websocket test completed');
+          }
+        } catch (error) {
+          console.error('Error processing message:', error);
+        }
+      };
+
+      wsRef.current.onerror = () => {
+        console.error('WebSocket error:', error);
+        //setError('WebSocket connection client error');
+      };
+
+      wsRef.current.onclose = () => {
+        console.log('WebSocket disconnected');
+        setTimeout(connectWebSocket, 3000);
+      };
+    };
+
+    connectWebSocket();
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, [error]);
 
   useEffect(() => {
     const fetchChat = async () => {
@@ -72,6 +111,10 @@ const ChatPage = ({ params: {chat_id} }:  ChatPageProps) => {
     }
 
     try {
+      if (wsRef.current) {
+        wsRef.current.send(JSON.stringify(messageData));
+      }
+
       const response = await sendMessage(messageData);
       console.log('Message sent successfully:', response);
       setNewMessage('');
