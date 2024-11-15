@@ -45,6 +45,7 @@ const AuthForm = ({ type }: { type: string }) => {
       email: "",
       password: "",
       restaurant: "",
+      picture: null,
     },
   })
 
@@ -54,14 +55,26 @@ const AuthForm = ({ type }: { type: string }) => {
 
     try {
       if(type === 'register') {
+        const file = (data.picture as FileList)?.[0] || null;
+
+        let pictureBase64 = null;
+        if (file) {
+          pictureBase64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+          });
+        }
+
         const userData = {
           name: data.name!,
           email: data.email,
           password: data.password,
           restaurant: data.restaurant,
-          picture: data.picture,
+          picture: pictureBase64,
         }
 
+        console.log('file:', file);
         const newUser = await register(userData);
         if(newUser) router.push('/');
       }
@@ -121,21 +134,12 @@ const AuthForm = ({ type }: { type: string }) => {
 
 
           {type === 'register' && (
-            // <CustomInput
-            //   control={form.control}
-            //   name="restaurant"
-            //   label="your restaurant name"
-            //   isDropdown
-            //   options={restaurants.map((restaurant: any) => ({
-            //     label: restaurant.name,
-            //     value: restaurant.$id,
-            //   }))}
-            // />
             <CustomInput
               control={form.control}
               name="picture"
               label="Picture"
               isUploadFile={true}
+              type="file"
             />
           )}
 
