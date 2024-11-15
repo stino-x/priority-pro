@@ -74,9 +74,8 @@ const AuthForm = ({ type }: { type: string }) => {
           picture: pictureBase64,
         }
 
-        console.log('file:', file);
         const newUser = await register(userData);
-        if(newUser) router.push('/');
+        if(newUser) router.push('/dashboard');
       }
 
       if(type === 'signin') {

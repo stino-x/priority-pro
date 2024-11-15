@@ -22,14 +22,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import useLogout from "@/lib/hooks/useLogout";
 import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
-import useGetMyImage from "@/lib/hooks/useGetMyImage";
+//import useGetMyImage from "@/lib/hooks/useGetMyImage";
+import { getUserInfo, getProfilePic, getLoggedInUser } from "@/lib/actions/user.action";
 
 export function UserNav() {
+  const [user, setUser] = useState(null);
+  const [profilePic, setProfilePic] = useState<string | undefined>('');
   const { logout } = useLogout()
   const { toast } = useToast()
-  const { imageSrc } = useGetMyImage();
-  const router = useRouter()
+  //const { imageSrc } = useGetMyImage();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const loggedUser = await getLoggedInUser();
+      if (!loggedUser) throw new Error('No logged-in user found');
+      setUser(loggedUser);
+      const profilePicUrl = await getProfilePic(loggedUser.picture);
+      setProfilePic(profilePicUrl);
+      console.log(profilePic);
+    }
+
+    fetchData();
+  }, [profilePic]);
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -58,7 +76,7 @@ export function UserNav() {
                 className="relative h-8 w-8 rounded-full"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={imageSrc} alt="Avatar" />
+                  <AvatarImage src={profilePic} alt="Avatar" />
                   <AvatarFallback className="bg-transparent">JD</AvatarFallback>
                 </Avatar>
               </Button>

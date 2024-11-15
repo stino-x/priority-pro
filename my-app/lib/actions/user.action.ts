@@ -78,7 +78,7 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
 
     if (!newUserAccount) throw new Error('Error creating user');
 
-    const  base64ToFile = (base64String, fileName) => {
+    const  base64ToFile = (base64String: string, fileName: string) => {
       const [mimeInfo, base64Data] = base64String.split(',');
       const mimeType = mimeInfo.match(/:(.*?);/)[1];
 
@@ -126,7 +126,7 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
     const session = await account.createEmailPasswordSession(email, password);
 
     cookies().set("appwrite-session", session.secret, {
-      path: "/",
+      path: "/dashboard",
       httpOnly: true,
       sameSite: "strict",
       secure: true,
@@ -226,3 +226,19 @@ export const fetchUsers = async (): Promise<User[]> => {
     return [];
   }
 }
+
+export const getProfilePic = async (fileId: string) => {
+  try {
+    const { storage } = await createAdminClient();
+    const result = await storage.getFilePreview(BUCKET_ID!, fileId);
+
+    const buffer = result instanceof ArrayBuffer ? result : new ArrayBuffer(0);
+    if (buffer.byteLength === 0) throw new Error("Failed to fetch profile picture buffer");
+
+    const base64String = Buffer.from(buffer).toString('base64');
+
+    return `data:image/jpeg;base64,${base64String}`;
+  } catch (error) {
+    console.error("Error fetching profile picture:", error);
+  }
+};
