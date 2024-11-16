@@ -1,105 +1,65 @@
-// function base64ToFile(base64String, fileName) {
-//   // Split the base64 string to remove the data type prefix
-//   const [mimeInfo, base64Data] = base64String.split(',');
-//   const mimeType = mimeInfo.match(/:(.*?);/)[1]; // Extract MIME type (e.g., "image/jpeg")
+"use server";
 
-//   // Decode the base64 string to binary data
-//   const binary = atob(base64Data);
-//   const binaryLength = binary.length;
-//   const binaryArray = new Uint8Array(binaryLength);
+import { Databases, Users, Client, Account } from "node-appwrite";
+import { cookies } from "next/headers";
 
-//   for (let i = 0; i < binaryLength; i++) {
-//     binaryArray[i] = binary.charCodeAt(i);
-//   }
+async function createSessionClient() {
+  const client = new Client()
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+    .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!);
 
-//   // Create a Blob object
-//   const blob = new Blob([binaryArray], { type: mimeType });
+    const session = cookies().get("appwrite-session");
 
-//   // Optionally convert Blob to File
-//   return new File([blob], fileName, { type: mimeType });
+    if (!session || !session.value) {
+      throw new Error("No session");
+    }
+
+  client.setSession(session.value);
+
+  return {
+    get account() {
+      return new Account(client);
+    },
+  };
+}
+
+async function createAdminClient() {
+  const client = new Client()
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+    .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!)
+    .setKey(process.env.NEXT_PUBLIC_API_KEY!);
+
+  return {
+    get account() {
+      return new Account(client);
+    },
+    get database() {
+      return new Databases(client);
+    },
+    get user() {
+      return new Users(client);
+    }
+  };
+}
+
+// async function clientSideAccount() {
+//   const client = new Client()
+//     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? '')
+//     .setProject(process.env.NEXT_PUBLIC_PROJECT_ID ?? '');
+//     .setKey(process.env.NEXT_APPWRITE_KEY!);
+
+//   return new Account(client);
 // }
 
-// // Example usage
-// const base64String = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD…AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//Z";
-// const fileName = "image.jpg";
-// const file = base64ToFile(base64String, fileName);
+// export const handleOAuthLogin = async (provider: string, successUrl: string, failureUrl: string) => {
+//   try {
+//     const account = await clientSideAccount();
+//     const result = account.createOAuth2Session(provider, successUrl, failureUrl);
+//     return result;
+//   } catch (error) {
+//     console.error('OAuth Login Error', error);
+//     throw error;
+//   }
+// };
 
-// console.log(file); // Output: File object
-
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
-'use client'
-
-import { getUserInfo, getProfilePic, getLoggedInUser } from "@/lib/actions/user.action";
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { getChats } from '@/lib/actions/chat.action';
-
-export default function Home() {
-  const [user, setUser] = useState(null);
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const loggedUser = await getLoggedInUser();
-        if (!loggedUser) throw new Error('No logged-in user found');
-        setUser(loggedUser);
-
-        const fetchedChats = await getChats();
-
-        const chatWithTitles = await Promise.all(
-          fetchedChats.map(async (chat: Chat) => {
-            const otherUserId = chat.user1_id === loggedUser.user_id ? chat.user2_id : chat.user1_id;
-            const otherUserInfo = await getUserInfo({ userid: otherUserId });
-
-            // Fetch profile picture for the other user
-            let profilePicUrl = null;
-            if (otherUserInfo?.profile_pic_id) {
-              profilePicUrl = await getProfilePic(otherUserInfo.profile_pic_id);
-            }
-
-            return {
-              ...chat,
-              title: otherUserInfo ? otherUserInfo.name : 'Unknown User',
-              profilePicUrl, // Store the profile picture URL with each chat
-            };
-          })
-        );
-
-        setChats(chatWithTitles);
-      } catch (error) {
-        console.error('Failed to fetch logged-in user or chats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  return (
-    <div>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-full">
-          {chats.map((chat: Chat) => (
-            <Link href={`/chat/${chat.chat_id}`} key={chat.chat_id}>
-              <div className="chat-title flex items-center space-x-2">
-                <h1>{chat.title}</h1>
-                {chat.profilePicUrl && (
-                  <Image src={chat.profilePicUrl} alt="User profile pic" width={50} height={50} />
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-      <Link href='/start'>Start a new Chat</Link>
-    </div>
-  );
-}
+export { createSessionClient, createAdminClient };

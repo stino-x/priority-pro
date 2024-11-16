@@ -24,6 +24,7 @@ export default function DashboardPage() {
       try {
         const user = await getLoggedInUser();
         setCurrentUser(user);
+        console.log('check user:', user)
       } catch (error) {
         console.error('Error fetching user:', error);
       }

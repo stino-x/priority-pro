@@ -126,7 +126,7 @@ export const register = async ({ password, ...userData }: SignUpParams) => {
     const session = await account.createEmailPasswordSession(email, password);
 
     cookies().set("appwrite-session", session.secret, {
-      path: "/dashboard",
+      path: "/",
       httpOnly: true,
       sameSite: "strict",
       secure: true,

@@ -24,7 +24,6 @@ import useLogout from "@/lib/hooks/useLogout";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
-//import useGetMyImage from "@/lib/hooks/useGetMyImage";
 import { getUserInfo, getProfilePic, getLoggedInUser } from "@/lib/actions/user.action";
 
 export function UserNav() {
@@ -32,7 +31,6 @@ export function UserNav() {
   const [profilePic, setProfilePic] = useState<string | undefined>('');
   const { logout } = useLogout()
   const { toast } = useToast()
-  //const { imageSrc } = useGetMyImage();
   const router = useRouter();
 
   useEffect(() => {
@@ -42,7 +40,6 @@ export function UserNav() {
       setUser(loggedUser);
       const profilePicUrl = await getProfilePic(loggedUser.picture);
       setProfilePic(profilePicUrl);
-      console.log(profilePic);
     }
 
     fetchData();

@@ -85,7 +85,7 @@ const AuthForm = ({ type }: { type: string }) => {
         }
 
         const signInResult = await signIn(userData);
-        if(signInResult) router.push('/');
+        if(signInResult) router.push('/dashboard');
       }
     } catch (error) {
       console.error(`Error during ${type}:`, error);

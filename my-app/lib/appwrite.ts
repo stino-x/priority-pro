@@ -16,6 +16,7 @@ async function createSessionClient() {
   const session = cookies().get("appwrite-session");
 
   if (!session || !session.value) {
+    console.log('testing appwrite server', cookies().get("appwrite-session"));
     throw new Error("No session");
   }
 
@@ -47,7 +48,7 @@ async function createAdminClient() {
       return new Users(adminClient!);
     },
     get storage() {
-      return new Storage(adminClient!); // Adding storage here
+      return new Storage(adminClient!);
     },
   };
 }
