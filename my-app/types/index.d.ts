@@ -24,6 +24,7 @@ declare interface PaginationProps {
 declare type User = {
   userid: string;
   name: string;
+  picture: string;
 };
 
 declare type Chat = {

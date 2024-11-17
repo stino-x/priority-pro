@@ -26,7 +26,7 @@ export interface Subtask {
 
 export interface User {
   userid: string;                // Required, string
-  picture_id?: string;
+  picture?: string;
   name: string;                  // Required, string
   email: string;                 // Required, must be an email
   can_assign_tasks: boolean;     // Required, boolean

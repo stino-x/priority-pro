@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react';
 import { MessageCircleMore } from 'lucide-react';
-import { getUserInfo, getLoggedInUser } from "@/lib/actions/user.action";
+import { getUserInfo, getLoggedInUser, getProfilePic } from "@/lib/actions/user.action";
 import { getChats } from '@/lib/actions/chat.action';
+import MessageCard from '@/components/message/MessageCard'
 
 export default function Messages() {
   const [user, setUser] = useState(null);
@@ -16,6 +17,7 @@ export default function Messages() {
       try {
         setLoading(true);
         const loggedUser = await getLoggedInUser();
+        console.log(loggedUser)
         if (!loggedUser) throw new Error('No logged-in user found');
         setUser(loggedUser);
 
@@ -23,18 +25,14 @@ export default function Messages() {
 
         const chatWithTitles = await Promise.all(
           fetchedChats.map(async (chat: Chat) => {
-            const otherUserId = chat.user1_id === loggedUser.user_id ? chat.user2_id : chat.user1_id;
+            const otherUserId = chat.user1_id === loggedUser.userid ? chat.user2_id : chat.user1_id;
             const otherUserInfo = await getUserInfo({ userid: otherUserId });
-
-            // let profilePicUrl = null;
-            // if (otherUserInfo?.profile_pic_id) {
-            //   profilePicUrl = await getProfilePic(otherUserInfo.profile_pic_id);
-            // }
+            let profilePicUrl = await getProfilePic(otherUserInfo.picture);
 
             return {
               ...chat,
               title: otherUserInfo ? otherUserInfo.name : 'Unknown User',
-              // profilePicUrl,
+              profilePicUrl,
             };
           })
         );
@@ -51,21 +49,21 @@ export default function Messages() {
   }, []);
 
   return (
-    <div>
+    <div className="h-[100dvh] bg-green-200">
       {loading ? (
-        <div>Loading...</div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-full">
+        <div className="flex flex-col">
           {chats.map((chat: Chat) => (
             <Link href={`/chat/${chat.chat_id}`} key={chat.chat_id}>
-              <div className="chat-title flex items-center space-x-2">
-                <h1>{chat.title}</h1>
-              </div>
+              <MessageCard title={chat.title} text="start chatting..." pic={chat.profilePicUrl} />
             </Link>
           ))}
         </div>
       )}
-      <Link href='/messages/start'>
+      <Link href='/messages/start' className="fixed bottom-[4rem] right-[1rem] p-4 flex gap-2 bg-red-800 w-[3rem] h-[3rem] rounded justify-center items-center">
         <MessageCircleMore className="w-[3rem] h-[3rem] text-[#ffadff]" />
       </Link>
     </div>
