@@ -128,15 +128,32 @@ export const register = async ({ password, ...userData }: RegisterParams) => {
     newUserAccount = await account.create(ID.unique(), email, password, name);
     if (!newUserAccount) throw new Error('Error creating user');
 
-    // 2. Handle picture upload if provided
-    if (picture && BUCKET_ID) {
-      try {
-        const pictureResponse = await storage.createFile(BUCKET_ID, ID.unique(), picture);
-        pictureId = pictureResponse.$id;
-      } catch (uploadError) {
-        console.error('Error uploading picture:', uploadError);
-        // Continue without picture rather than failing registration
+    const  base64ToFile = (base64String: string, fileName: string) => {
+      const [mimeInfo, base64Data] = base64String.split(',');
+      const mimeType = mimeInfo.match(/:(.*?);/)[1];
+
+      const binary = atob(base64Data);
+      const binaryLength = binary.length;
+      const binaryArray = new Uint8Array(binaryLength);
+
+      for (let i = 0; i < binaryLength; i++) {
+        binaryArray[i] = binary.charCodeAt(i);
       }
+
+      const blob = new Blob([binaryArray], { type: mimeType });
+      return new File([blob], fileName, { type: mimeType });
+    }
+
+    const file = base64ToFile(picture, `image.jpg`);
+
+    let pictureId = null;
+    if (picture && BUCKET_ID) {
+      const pictureResponse = storage.createFile(
+        BUCKET_ID,
+        ID.unique(),
+        file
+      );
+      pictureId = (await pictureResponse).$id;
     }
 
     // 3. Create user document using the same ID as the account
@@ -149,7 +166,7 @@ export const register = async ({ password, ...userData }: RegisterParams) => {
         userid: newUserAccount.$id,
         name: newUserAccount.name,
         email: newUserAccount.email,
-        picture_id: pictureId,
+        picture: pictureId,
         can_assign_tasks: false,
         assigned_tasks: [],
         email_verified: false,
@@ -172,6 +189,16 @@ export const register = async ({ password, ...userData }: RegisterParams) => {
       // Continue registration but flag for follow-up
     }
 
+    const session = await account.createEmailPasswordSession(email, password);
+
+    cookies().set("appwrite-session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+    });
+
+
     return parseStringify(newUser);
   } catch (error) {
     // If account was created but later steps failed, clean up
@@ -185,6 +212,7 @@ export const register = async ({ password, ...userData }: RegisterParams) => {
         console.error('Cleanup error:', cleanupError);
       }
     }
+    console.error('Error during user registration:', error);
     throw error;
   }
 };
