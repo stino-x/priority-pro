@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from "react";
 import { resendVerificationEmail } from "@/lib/actions/user.action";
 
