@@ -77,3 +77,11 @@ comment: Comment[];                 // Relationship with comments (array of Comm
 // Assigned by relationship
 assigned_by: User;                  // Relationship with User (the user who assigned the task)
 }
+
+export interface Chat {
+  chat_id: string;       // Unique identifier for the chat
+  user1_id: string;      // Identifier for the first user
+  user2_id: string;      // Identifier for the second user
+  created_at: Date;      // Date and time when the chat was created
+  title: string;         // Title of the chat
+}

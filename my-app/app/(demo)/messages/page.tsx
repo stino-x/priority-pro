@@ -6,6 +6,7 @@ import { MessageCircleMore } from 'lucide-react';
 import { getUserInfo, getLoggedInUser, getProfilePic } from "@/lib/actions/user.action";
 import { getChats } from '@/lib/actions/chat.action';
 import MessageCard from '@/components/message/MessageCard'
+import { Chat } from '@/lib/interfaces/interface';
 
 export default function Messages() {
   const [user, setUser] = useState(null);
@@ -26,7 +27,7 @@ export default function Messages() {
         const chatWithTitles = await Promise.all(
           fetchedChats.map(async (chat: Chat) => {
             const otherUserId = chat.user1_id === loggedUser.userid ? chat.user2_id : chat.user1_id;
-            const otherUserInfo = await getUserInfo({ userid: otherUserId });
+            const otherUserInfo = await getUserInfo( otherUserId );
             let profilePicUrl = await getProfilePic(otherUserInfo.picture);
 
             return {
@@ -58,8 +59,18 @@ export default function Messages() {
         <div className="flex flex-col">
           {chats.map((chat: Chat) => (
             <Link href={`/chat/${chat.chat_id}`} key={chat.chat_id}>
-              <MessageCard title={chat.title} text="start chatting..." pic={chat.profilePicUrl} />
-            </Link>
+            {/*  <MessageCard 
+              title={chat.title} 
+              text="start chatting..." 
+              pic={chat.profilePicUrl"} 
+            /> */}
+            <MessageCard 
+              title={chat.title} 
+              text="start chatting..." 
+              pic={"https://source.unsplash.com/random"} 
+            />
+          </Link>
+          
           ))}
         </div>
       )}

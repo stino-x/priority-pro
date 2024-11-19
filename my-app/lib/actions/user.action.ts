@@ -21,7 +21,7 @@ interface RegisterParams {
   email: string;
   password: string;
   name: string;
-  picture?: File;
+  picture: string;
   [key: string]: any;
 }
 
@@ -99,6 +99,19 @@ export const handleVerification = async () => {
   }
 };
 
+export const getProfilePic = async (fileId: string) => {
+  try {
+    const { storage } = await createAdminClient();
+    const result = await storage.getFilePreview(BUCKET_ID!, fileId);
+    const buffer = result instanceof ArrayBuffer ? result : new ArrayBuffer(0);
+    if (buffer.byteLength === 0) throw new Error("Failed to fetch profile picture buffer");
+    const base64String = Buffer.from(buffer).toString('base64');
+    return `data:image/jpeg;base64,${base64String}`;
+  } catch (error) {
+    console.error("Error fetching profile picture:", error);
+  }
+};
+
 
 export const resendVerificationEmail = async () => {
   const { account } = await createSessionClient();
@@ -114,6 +127,27 @@ export const resendVerificationEmail = async () => {
 };
 
 
+export  const  base64ToFile = (base64String: string, fileName: string) => {
+  const [mimeInfo, base64Data] = base64String.split(',');
+  const mimeTypeMatch = mimeInfo.match(/:(.*?);/);
+  if (!mimeTypeMatch) {
+    throw new Error('Invalid base64 string');
+  }
+  const mimeType = mimeTypeMatch[1];
+
+  const binary = atob(base64Data);
+  const binaryLength = binary.length;
+  const binaryArray = new Uint8Array(binaryLength);
+
+  for (let i = 0; i < binaryLength; i++) {
+    binaryArray[i] = binary.charCodeAt(i);
+  }
+
+  const blob = new Blob([binaryArray], { type: mimeType });
+  return new File([blob], fileName, { type: mimeType });
+}
+
+
 
 export const register = async ({ password, ...userData }: RegisterParams) => {
   const { email, name, picture } = userData;
@@ -123,26 +157,10 @@ export const register = async ({ password, ...userData }: RegisterParams) => {
 
   try {
     ({ account, database, storage } = await createAdminClient());
-    
+
     // 1. Create the user account first
     newUserAccount = await account.create(ID.unique(), email, password, name);
     if (!newUserAccount) throw new Error('Error creating user');
-
-    const  base64ToFile = (base64String: string, fileName: string) => {
-      const [mimeInfo, base64Data] = base64String.split(',');
-      const mimeType = mimeInfo.match(/:(.*?);/)[1];
-
-      const binary = atob(base64Data);
-      const binaryLength = binary.length;
-      const binaryArray = new Uint8Array(binaryLength);
-
-      for (let i = 0; i < binaryLength; i++) {
-        binaryArray[i] = binary.charCodeAt(i);
-      }
-
-      const blob = new Blob([binaryArray], { type: mimeType });
-      return new File([blob], fileName, { type: mimeType });
-    }
 
     const file = base64ToFile(picture, `image.jpg`);
 

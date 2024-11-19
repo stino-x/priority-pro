@@ -27,13 +27,6 @@ declare type User = {
   picture: string;
 };
 
-declare type Chat = {
-  chat_id: string;
-  title: string;
-  user1_id: string;
-  user2_id: string;
-};
-
 declare type MessageProps = {
   $id: string;
   message_id: string;
