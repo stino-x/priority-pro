@@ -3,13 +3,16 @@
 import { createAdminClient, createSessionClient } from "../appwrite";
 import { ID, Query } from "node-appwrite";
 import { parseStringify, taskFormSchema } from "../utils";
-import { getLoggedInUser } from "./user.action";
+import { getLoggedInUser, getUserInfo } from "./user.action";
+import axios from 'axios';
 import { Task } from "../interfaces/interface";
 
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
   NEXT_PUBLIC_USER_COLLECTION_ID: USER_COLLECTION_ID,
   NEXT_PUBLIC_TASKS_COLLECTION_ID: TASKS_COLLECTION_ID,
+  NEXT_PUBLIC_SEND_IN_BLUE_API_KEY: BREVO_API_KEY,
+  NEXT_PUBLIC_TEMPLATE_ID: TEMPLATE_ID,
 } = process.env;
 
 interface CreateTasksProps {
@@ -21,6 +24,37 @@ interface CreateTasksProps {
   user: string
 }
 
+export const sendEmail = async (recipientEmail: string, assignername: string, firstName: string, description: string, restaurant: string, address: string) => {
+
+  const emailData = {
+    sender: { email: 'your_email@example.com' },  // Replace with your sender email
+    to: [{ email: recipientEmail }],  // Recipient email
+    templateId: TEMPLATE_ID,  // Template ID for the email template
+    params: {
+      FIRSTNAME: firstName,  // Dynamic content for personalization
+      ASSIGNERNAME: assignername, 
+      DESCRIPTION: description, //
+      ADDRESS: address, //
+      RESTAURANT: restaurant, //
+    },
+  };
+
+  try {
+    const response = await axios.post('https://api.brevo.com/v3/smtp/email', emailData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': BREVO_API_KEY,  // Add your Brevo API key in the header
+      },
+    });
+
+    console.log('Email sent successfully:', response.data);
+    return response.data;  // Optional: return the API response
+  } catch (error: any) {
+    console.error('Error sending email:', error.message);
+    throw error;  // Throw error to be handled by caller if necessary
+  }
+};
+
 export async function createTask(data: any) {
   try {
     const parsedData = taskFormSchema.parse(data);
@@ -30,7 +64,7 @@ export async function createTask(data: any) {
 
     // Get the current user
     const currentUser = await account.get();
-    const userId = currentUser.$id;
+    const userId = currentUser.$id; //id of assigner
 
     if (!userId) {
       throw new Error('User ID is missing');
@@ -66,6 +100,28 @@ export async function createTask(data: any) {
         assigned_by: userId
       }
     );
+
+    // Send email after task is created
+    if (createdTask) {
+      // Pass required parameters to sendEmail
+      const userInfo = await getUserInfo(userId); // get user info using user ID
+      const assignername = userInfo.name
+      const recipient = await getUserInfo(parsedData.user);
+      const Email = recipient.email; // Ensure the email exists in user info
+      const taskDescription = parsedData.description;
+      const restaurantName = restaurantQuery.documents[0].restaurant.name; // Assuming the restaurant name is in the restaurant object
+      const userFirstName = recipient.name; // Assuming first name is part of the user object
+
+      // Call the sendEmail function with dynamic content
+      await sendEmail(
+        Email,
+        assignername,
+        userFirstName, // Use the user's first name
+        taskDescription, // Pass task description
+        restaurantName, // Pass restaurant name
+        restaurantQuery.documents[0].restaurant.address // Assuming address is in parsedData.restaurant object
+      );
+    }
 
     const taskId = createdTask.$id;
 

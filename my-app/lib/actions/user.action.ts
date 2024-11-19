@@ -36,7 +36,7 @@ interface getUserInfoProps {
 
 
 
-export const getUserInfo = async ({ userid }: getUserInfoProps) => {
+export const getUserInfo = async ( userid: string ) => {
   try {
     const { database } = await createAdminClient();
 
@@ -64,7 +64,7 @@ export const signIn = async ({ email, password }: SignInParams) => {
       secure: true,
     });
 
-    const user = await getUserInfo({ userid: session.userId })
+    const user = await getUserInfo( session.userId )
 
     return parseStringify(user);
   } catch (error) {
@@ -198,7 +198,7 @@ export const getLoggedInUser = async () => {
     const { account } = await createSessionClient();
     const result = await account.get();
 
-    const user = await getUserInfo({ userid: result.$id})
+    const user = await getUserInfo( result.$id)
 
     return parseStringify(user);
   } catch (error) {
