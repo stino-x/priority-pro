@@ -7,12 +7,17 @@ import { cookies } from "next/headers";
 const isAuthenticated = (request: NextRequest) => {
   // Example: Check for a session token or user information in cookies
   const token = cookies().get("appwrite-session");
+  //console.log('token', token)
+   // const session = cookies().get("appwrite-session");
+        // console.log(session);
   return !!token; // Return true if the token exists
+  //request: NextRequest
 };
 
 export function middleware(request: NextRequest) {
   // Log the path for debugging purposes
   console.log('Middleware executing for path:', request.nextUrl.pathname);
+  isAuthenticated(request)
 
   // Check if the user is authenticated
   if (!isAuthenticated(request)) {

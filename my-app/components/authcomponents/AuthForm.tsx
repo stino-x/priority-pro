@@ -47,6 +47,7 @@ const AuthForm = ({ type }: { type: string }) => {
       email: "",
       password: "",
       restaurant: "",
+      picture: null,
     },
   })
 
@@ -56,16 +57,27 @@ const AuthForm = ({ type }: { type: string }) => {
 
     try {
       if(type === 'register') {
+        const file = (data.picture as FileList)?.[0] || null;
+
+        let pictureBase64 = null;
+        if (file) {
+          pictureBase64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+          });
+        }
+
         const userData = {
           name: data.name!,
           email: data.email,
           password: data.password,
           restaurant: data.restaurant,
-          picture: data.picture,
+          picture: pictureBase64,
         }
 
         const newUser = await register(userData);
-        if(newUser) router.push('/');
+        if(newUser) router.push('/dashboard');
       }
 
       if(type === 'signin') {
@@ -75,7 +87,7 @@ const AuthForm = ({ type }: { type: string }) => {
         }
 
         const signInResult = await signIn(userData);
-        if(signInResult) router.push('/');
+        if(signInResult) router.push('/dashboard');
       }
     } catch (error) {
       console.error(`Error during ${type}:`, error);
@@ -128,21 +140,12 @@ const AuthForm = ({ type }: { type: string }) => {
 
 
           {type === 'register' && (
-            // <CustomInput
-            //   control={form.control}
-            //   name="restaurant"
-            //   label="your restaurant name"
-            //   isDropdown
-            //   options={restaurants.map((restaurant: any) => ({
-            //     label: restaurant.name,
-            //     value: restaurant.$id,
-            //   }))}
-            // />
             <CustomInput
               control={form.control}
               name="picture"
               label="Picture"
               isUploadFile={true}
+              type="file"
             />
           )}
 

@@ -43,12 +43,12 @@ export const authFormSchema = (type: string) => z.object({
     ? z.string().nonempty("Restaurant is required")
     : z.string().optional(),
   picture: type === 'register'
-    ? z.instanceof(File)
-      .refine((file) => file.size <= MAX_FILE_SIZE, 'Max file size is 5MB.')
-      .refine(
-        (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
-        'Only .jpg, .jpeg, .png and .webp files are accepted.'
-      ).optional()
+    ?  z
+    .any()
+    .refine((file) => file instanceof FileList ? file.length > 0 && file[0] instanceof File : true, {
+      message: "profile_pic must be a valid file or left blank",
+    })
+    .optional()
     : z.instanceof(File).optional(), 
 });
 

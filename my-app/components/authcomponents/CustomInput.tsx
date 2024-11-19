@@ -32,7 +32,7 @@ const CustomInput = ({
     <FormField
       control={control}
       name={name}
-      render={({ field: { onChange, value, ...field } }) => (
+      render={({ field }) => (
         <div className="form-item">
           <FormLabel className="form-label">{label}</FormLabel>
           <div className="flex w-full flex-col">
@@ -42,11 +42,7 @@ const CustomInput = ({
                   <Input
                     type="file"
                     className="border-slate-600 bg-transparent border-2 rounded file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-600 file:text-white hover:file:bg-slate-700"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      onChange(file);
-                    }}
-                    {...field}
+                    onChange={(e) => field.onChange(e.target.files)}
                   />
                 </div>
               ) : !isDropdown ? (
@@ -54,15 +50,11 @@ const CustomInput = ({
                   placeholder={placeholder}
                   className="border-slate-600 bg-transparent border-2 rounded"
                   type={type === 'password' ? 'password' : type}
-                  value={value as string}
-                  onChange={onChange}
                   {...field}
                 />
               ) : (
                 <select
                   className="border-slate-600 bg-transparent border-2 rounded p-2"
-                  value={value as string}
-                  onChange={onChange}
                   {...field}
                 >
                   <option value="" disabled>
