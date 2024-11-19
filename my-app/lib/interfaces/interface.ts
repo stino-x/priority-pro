@@ -25,19 +25,19 @@ export interface Subtask {
 
 
 export interface User {
-  userid: string;                // Required, string
-  picture?: string;
-  email_verified?: boolean;
-  name: string;                  // Required, string
-  email: string;                 // Required, must be an email
-  can_assign_tasks: boolean;     // Required, boolean
-  assigned_tasks: string[];      // Required, array of strings
-  created_at: Date;              // Required, datetime (using JS Date object)
-  updated_at?: Date;             // Optional, datetime (using JS Date object)
-  
-  // Relationships
-  comment: Comment[];            // Assuming a one-to-many relationship with comments
-  restaurant: Restaurant;        // Assuming a one-to-one or one-to-many relationship with a restaurant
+userid: string;                // Required, string
+picture?: string;
+email_verified?: boolean;
+name: string;                  // Required, string
+email: string;                 // Required, must be an email
+can_assign_tasks: boolean;     // Required, boolean
+assigned_tasks: string[];      // Required, array of strings
+created_at: Date;              // Required, datetime (using JS Date object)
+updated_at?: Date;             // Optional, datetime (using JS Date object)
+
+// Relationships
+comment: Comment[];            // Assuming a one-to-many relationship with comments
+restaurant: Restaurant;        // Assuming a one-to-one or one-to-many relationship with a restaurant
 }
 
 export interface Task {
