@@ -14,6 +14,7 @@ import {
 import { getTaskById } from "@/lib/actions/task.action";
 import { Dot } from 'lucide-react';
 import { CiCalendarDate } from "react-icons/ci";
+import { Comment, Subtask } from "@/lib/interfaces/interface";
 
 export default async function TaskPage({ params: { $id } }: { params: { $id: string } }) {
   const fetchTask = await getTaskById($id);
@@ -127,11 +128,11 @@ export default async function TaskPage({ params: { $id } }: { params: { $id: str
             <h2 className="bg-gray-100 h-[1.5rem] rounded font-semibold text-xs text-zinc-900 ml-4">{task.is_verified ? "Verified" : "Not Verified"}</h2>
           </div>
           <h1 className="font-semibold text-lg text-zinc-900">Subtasks</h1>
-          {task.subtasks.map((subTask) => {
+          {task.subtasks.map((subTask: Subtask) => {
             <h2>subTask.title</h2>
           })}
           <h1 className="font-semibold text-lg text-zinc-900">Chats</h1>
-          {task.comment.map((comment) => {
+          {task.comment.map((comment: Comment) => {
             <h2>comment.title</h2>
           })}
         </div>

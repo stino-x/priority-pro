@@ -23,10 +23,12 @@ import {
 import useLogout from "@/lib/hooks/useLogout";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation'
+import useGetMyImage from "@/lib/hooks/useGetMyImage";
 
 export function UserNav() {
   const { logout } = useLogout()
   const { toast } = useToast()
+  const { imageSrc } = useGetMyImage();
   const router = useRouter()
   const handleLogout = async () => {
     try {
@@ -56,7 +58,7 @@ export function UserNav() {
                 className="relative h-8 w-8 rounded-full"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="#" alt="Avatar" />
+                  <AvatarImage src={imageSrc} alt="Avatar" />
                   <AvatarFallback className="bg-transparent">JD</AvatarFallback>
                 </Avatar>
               </Button>

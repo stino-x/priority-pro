@@ -12,9 +12,10 @@ interface CustomInputProps {
   name: FieldPath<z.infer<typeof formSchema>>;
   label: string;
   placeholder?: string;
-  type?: string; // Specify input types (e.g., text, number)
-  isDropdown?: boolean; // New prop to indicate dropdown
-  options?: { label: string; value: string }[]; // Dropdown options if it's a select input
+  type?: string;
+  isDropdown?: boolean;
+  isUploadFile?: boolean;
+  options?: { label: string; value: string }[];
 }
 
 const CustomInput = ({
@@ -24,31 +25,45 @@ const CustomInput = ({
   placeholder = '',
   type = 'text',
   isDropdown = false,
+  isUploadFile = false,
   options = [],
 }: CustomInputProps) => {
   return (
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
+      render={({ field: { onChange, value, ...field } }) => (
         <div className="form-item">
           <FormLabel className="form-label">{label}</FormLabel>
           <div className="flex w-full flex-col">
             <FormControl>
-              {/* Conditionally render input or select based on isDropdown */}
-              {!isDropdown ? (
+              {isUploadFile ? (
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Input
+                    type="file"
+                    className="border-slate-600 bg-transparent border-2 rounded file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-600 file:text-white hover:file:bg-slate-700"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      onChange(file);
+                    }}
+                    {...field}
+                  />
+                </div>
+              ) : !isDropdown ? (
                 <Input
                   placeholder={placeholder}
-                  className="border-slate-600 bg-[transparent] border-2 rounded"
+                  className="border-slate-600 bg-transparent border-2 rounded"
                   type={type === 'password' ? 'password' : type}
+                  value={value as string}
+                  onChange={onChange}
                   {...field}
                 />
               ) : (
                 <select
-                  className="border-slate-600 bg-[transparent] border-2 rounded p-2"
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
+                  className="border-slate-600 bg-transparent border-2 rounded p-2"
+                  value={value as string}
+                  onChange={onChange}
+                  {...field}
                 >
                   <option value="" disabled>
                     Select an option
@@ -58,7 +73,7 @@ const CustomInput = ({
                       {option.label}
                     </option>
                   ))}
-                </select> // you can replace this with a better UI dropdown later if needed
+                </select>
               )}
             </FormControl>
             <FormMessage className="form-message mt-2" />

@@ -12,9 +12,11 @@ import CustomInput from './CustomInput';
 import { authFormSchema } from '@/lib/utils';
 import { register, signIn, handleOAuthLogin, getLoggedInUser } from '@/lib/actions/user.action';
 import useGetRestaurants from "@/lib/hooks/useGetRestaurants";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthForm = ({ type }: { type: string }) => {
   const router = useRouter();
+  const {toast} = useToast()
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState(null);
@@ -58,7 +60,8 @@ const AuthForm = ({ type }: { type: string }) => {
           name: data.name!,
           email: data.email,
           password: data.password,
-          restaurant: data.restaurant
+          restaurant: data.restaurant,
+          picture: data.picture,
         }
 
         const newUser = await register(userData);
@@ -76,6 +79,11 @@ const AuthForm = ({ type }: { type: string }) => {
       }
     } catch (error) {
       console.error(`Error during ${type}:`, error);
+      toast({
+        title: `Error during ${type}:`,
+        description: "Please try again.",
+        variant: "destructive", // This will style the toast as an error message
+      });
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -112,6 +120,29 @@ const AuthForm = ({ type }: { type: string }) => {
                 label: restaurant.name,
                 value: restaurant.$id,
               }))}
+            />
+          )}
+
+
+          {/* IMAGE UPLAOD */}
+
+
+          {type === 'register' && (
+            // <CustomInput
+            //   control={form.control}
+            //   name="restaurant"
+            //   label="your restaurant name"
+            //   isDropdown
+            //   options={restaurants.map((restaurant: any) => ({
+            //     label: restaurant.name,
+            //     value: restaurant.$id,
+            //   }))}
+            // />
+            <CustomInput
+              control={form.control}
+              name="picture"
+              label="Picture"
+              isUploadFile={true}
             />
           )}
 
