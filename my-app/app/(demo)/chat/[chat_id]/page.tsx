@@ -3,6 +3,7 @@
 import { getChat } from '@/lib/actions/chat.action';
 import { getMessages, sendMessage } from '@/lib/actions/message.action';
 import { useEffect, useRef, useState } from 'react';
+import { Chat } from '@/lib/interfaces/interface';
 //import { useSocket } from '@/lib/socketClient';
 
 const ChatPage = ({ params: {chat_id} }:  ChatPageProps) => {

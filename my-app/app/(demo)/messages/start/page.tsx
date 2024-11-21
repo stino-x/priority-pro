@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { fetchUsers, getLoggedInUser, getProfilePic } from "@/lib/actions/user.action";
 import { createChat } from "@/lib/actions/chat.action";
 import MessageCard from '@/components/message/MessageCard'
+import { User } from '@/lib/interfaces/interface';
 
 
 export default function Start() {
@@ -69,7 +70,8 @@ export default function Start() {
           <h2 className="text-slate-600 font-semibold text-[22px] mb-4">Restautrants Users</h2>
           {users.map((user: User) => (
             <button type="button" key={user.userid} onClick={() => handleClick(user.userid, user.name)}>
-              <MessageCard title={user.name} text="start chatting..." pic={user.profilePicUrl} />
+              {/* <MessageCard title={user.name} text="start chatting..." pic={user.profilePicUrl} /> */}
+              <MessageCard title={user.name} text="start chatting..." pic={"https://source.unsplash.com/random"} />
             </button>
           ))}
         </div>

@@ -26,7 +26,7 @@ task: Task;                     // Relationship with Task (the parent task)
 
 export interface User {
 userid: string;                // Required, string
-picture?: string;
+picture: string;
 email_verified?: boolean;
 name: string;                  // Required, string
 email: string;                 // Required, must be an email

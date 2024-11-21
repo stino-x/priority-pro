@@ -73,7 +73,7 @@ const AuthForm = ({ type }: { type: string }) => {
           email: data.email,
           password: data.password,
           restaurant: data.restaurant,
-          picture: pictureBase64,
+          picture: pictureBase64 as string,
         }
 
         console.log(userData)

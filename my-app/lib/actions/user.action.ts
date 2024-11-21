@@ -68,7 +68,7 @@ export const signIn = async ({ email, password }: SignInParams) => {
 
     return parseStringify(user);
   } catch (error) {
-    console.error('Error occured when siging in:', error);
+    console.error('Error occurred when sign in:', error);
   }
 };
 
@@ -164,7 +164,11 @@ export const register = async ({ password, ...userData }: RegisterParams) => {
 
     const  base64ToFile = (base64String: string, fileName: string) => {
       const [mimeInfo, base64Data] = base64String.split(',');
-      const mimeType = mimeInfo.match(/:(.*?);/)[1];
+      const mimeTypeMatch = mimeInfo.match(/:(.*?);/);
+      if (!mimeTypeMatch) {
+        throw new Error('Invalid base64 string');
+      }
+      const mimeType = mimeTypeMatch[1];
       const binary = atob(base64Data);
       const binaryLength = binary.length;
       const binaryArray = new Uint8Array(binaryLength);
