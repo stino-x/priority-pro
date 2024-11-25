@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { User } from "../interfaces/interface";
 import { useToast } from "@/hooks/use-toast";
+import { Client, Account } from "appwrite";
 
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
@@ -54,7 +55,8 @@ export const getUserInfo = async ( userid: string ) => {
 
 export const signIn = async ({ email, password }: SignInParams) => {
   try {
-    const { account } = await createSessionClient();
+    const { account } = await createAdminClient();
+    console.log('#######', account);
     const session = await account.createEmailPasswordSession(email, password);
 
     cookies().set("appwrite-session", session.secret, {
@@ -127,28 +129,6 @@ export const resendVerificationEmail = async () => {
 };
 
 
-// export  const  base64ToFile = (base64String: string, fileName: string) => {
-//   const [mimeInfo, base64Data] = base64String.split(',');
-//   const mimeTypeMatch = mimeInfo.match(/:(.*?);/);
-//   if (!mimeTypeMatch) {
-//     throw new Error('Invalid base64 string');
-//   }
-//   const mimeType = mimeTypeMatch[1];
-
-//   const binary = atob(base64Data);
-//   const binaryLength = binary.length;
-//   const binaryArray = new Uint8Array(binaryLength);
-
-//   for (let i = 0; i < binaryLength; i++) {
-//     binaryArray[i] = binary.charCodeAt(i);
-//   }
-
-//   const blob = new Blob([binaryArray], { type: mimeType });
-//   return new File([blob], fileName, { type: mimeType });
-// }
-
-
-
 export const register = async ({ password, ...userData }: RegisterParams) => {
   const { email, name, picture } = userData;
   let newUserAccount;
@@ -211,18 +191,18 @@ export const register = async ({ password, ...userData }: RegisterParams) => {
     );
 
     // 4. Send verification email
-    try {
-      const verification = await account.createVerification(
-        `${process.env.NEXT_PUBLIC_APP_URL}/verification`
-      );
-      if (!verification) {
-        // Log but don't throw - user can request verification email later
-        console.warn('Verification email not sent - will need to resend');
-      }
-    } catch (verificationError) {
-      console.error('Error sending verification:', verificationError);
-      // Continue registration but flag for follow-up
-    }
+    // try {
+    //   const verification = await account.createVerification(
+    //     `${process.env.NEXT_PUBLIC_APP_URL}/verification`
+    //   );
+    //   if (!verification) {
+    //     // Log but don't throw - user can request verification email later
+    //     console.warn('Verification email not sent - will need to resend');
+    //   }
+    // } catch (verificationError) {
+    //   console.error('Error sending verification:', verificationError);
+    //   // Continue registration but flag for follow-up
+    // }
 
     const session = await account.createEmailPasswordSession(email, password);
 

@@ -35,22 +35,39 @@ export const parseStringify = (value: any) => {
   }
 };
 
-export const authFormSchema = (type: string) => z.object({
-  name: type === 'signin' ? z.string().optional() : z.string().min(3, "Name must be at least 3 characters"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  restaurant: type === 'register' 
-    ? z.string().nonempty("Restaurant is required")
-    : z.string().optional(),
-  picture: type === 'register'
-    ?  z
-    .any()
-    .refine((file) => file instanceof FileList ? file.length > 0 && file[0] instanceof File : true, {
-      message: "profile_pic must be a valid file or left blank",
-    })
-    .optional()
-    : z.instanceof(File).optional(), 
-});
+export const authFormSchema = (type: string) => {
+  // Base schema with common fields
+  const baseSchema = {
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+  }
+
+  if (type === 'signin') {
+    // Sign-in schema should only validate email and password
+    return z.object(baseSchema)
+  }
+
+  // Registration schema includes additional fields
+  return z.object({
+    ...baseSchema,
+    name: z.string().min(3, "Name must be at least 3 characters"),
+    restaurant: z.string().nonempty("Restaurant is required"),
+    picture: z
+      .any()
+      .refine(
+        (file) => {
+          if (file instanceof FileList) {
+            return file.length > 0 && file[0] instanceof File
+          }
+          return true // Allow empty/optional
+        },
+        {
+          message: "Profile picture must be a valid file or left blank",
+        }
+      )
+      .optional(),
+  })
+}
 
 export const taskFormSchema = z.object({
   title: z.string().min(1, "Title is required"),

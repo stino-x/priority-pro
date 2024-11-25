@@ -59,16 +59,16 @@ export default function Messages() {
         <div className="flex flex-col">
           {chats.map((chat: Chat) => (
             <Link href={`/chat/${chat.chat_id}`} key={chat.chat_id}>
-            {/*  <MessageCard 
+              <MessageCard 
               title={chat.title} 
               text="start chatting..." 
-              pic={chat.profilePicUrl"} 
-            /> */}
-            <MessageCard 
+              pic={chat.profilePicUrl} 
+              />
+            {/* <MessageCard 
               title={chat.title} 
               text="start chatting..." 
               pic={"https://source.unsplash.com/random"} 
-            />
+            /> */}
           </Link>
           
           ))}

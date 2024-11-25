@@ -7,24 +7,20 @@ let sessionClient: Client | null = null;
 let adminClient: Client | null = null;
 
 async function createSessionClient() {
-  if (!sessionClient) {
-    sessionClient = new Client()
-      .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-      .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!);
-  }
+  const client = new Client()
+  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+  .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!);
 
   const session = cookies().get("appwrite-session");
-
   if (!session || !session.value) {
-    console.log('testing appwrite server', cookies().get("appwrite-session"));
     throw new Error("No session");
   }
 
-  sessionClient.setSession(session.value);
+  client.setSession(session.value);
 
   return {
     get account() {
-      return new Account(sessionClient!);
+      return new Account(client);
     },
   };
 }

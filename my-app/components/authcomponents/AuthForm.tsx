@@ -40,15 +40,20 @@ const AuthForm = ({ type }: { type: string }) => {
 
   const formSchema = authFormSchema(type)
 
+  const defaultValues = type === 'register' ? {
+    name: "",
+    email: "",
+    password: "",
+    restaurant: "",
+    picture: null,
+  } : {
+    email: "",
+    password: "",
+  }
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      restaurant: "",
-      picture: null,
-    },
+    defaultValues,
   })
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -76,8 +81,6 @@ const AuthForm = ({ type }: { type: string }) => {
           picture: pictureBase64 as string,
         }
 
-        console.log(userData)
-
         const newUser = await register(userData);
         if(newUser) router.push('/dashboard');
       }
@@ -88,7 +91,11 @@ const AuthForm = ({ type }: { type: string }) => {
           password: data.password,
         }
 
+        console.log('test signing in')
+
         const signInResult = await signIn(userData);
+        console.log(userData)
+        console.log(signInResult)
         if(signInResult) router.push('/dashboard');
       }
     } catch (error) {
@@ -96,7 +103,7 @@ const AuthForm = ({ type }: { type: string }) => {
       toast({
         title: `Error during ${type}:`,
         description: "Please try again.",
-        variant: "destructive", // This will style the toast as an error message
+        variant: "destructive",
       });
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
@@ -153,7 +160,7 @@ const AuthForm = ({ type }: { type: string }) => {
 
           {error && <p className="text-red-500 mt-2">{error}</p>}
 
-          <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
+          <Button type="submit" className="mt-4 w-full" >
             {isLoading ? 'Loading...' : (type === 'signin' ? 'Sign In' : 'Register')}
           </Button>
         </form>
