@@ -36,18 +36,15 @@ export const parseStringify = (value: any) => {
 };
 
 export const authFormSchema = (type: string) => {
-  // Base schema with common fields
   const baseSchema = {
     email: z.string().email("Invalid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
   }
 
   if (type === 'signin') {
-    // Sign-in schema should only validate email and password
     return z.object(baseSchema)
   }
 
-  // Registration schema includes additional fields
   return z.object({
     ...baseSchema,
     name: z.string().min(3, "Name must be at least 3 characters"),
@@ -59,7 +56,7 @@ export const authFormSchema = (type: string) => {
           if (file instanceof FileList) {
             return file.length > 0 && file[0] instanceof File
           }
-          return true // Allow empty/optional
+          return true
         },
         {
           message: "Profile picture must be a valid file or left blank",
