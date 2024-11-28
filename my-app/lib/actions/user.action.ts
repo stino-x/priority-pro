@@ -14,6 +14,7 @@ const {
   NEXT_PUBLIC_USER_COLLECTION_ID: USER_COLLECTION_ID,
   NEXT_PUBLIC_RESTAURANT_COLLECTION_ID: RESTAURANT_COLLECTION_ID,
   NEXT_PUBLIC_BUCKET_ID: BUCKET_ID,
+  NEXT_PUBLIC_APP_URL: VERIFICATION_URL,
 } = process.env;
 
 
@@ -203,11 +204,6 @@ export const register = async ({  ...userData }: RegisterParams) => {
 
     // 1. Create the user account
     try {
-      console.log("Attempting to create an account:", {
-        email: userData.email,
-        name: userData.name,
-        passwordLength: password.length,
-      });
       newUserAccount = await account.create(ID.unique(), email, password, name);
     } catch (error: any) {
       console.error('Account Creation Error:', {
@@ -236,12 +232,13 @@ export const register = async ({  ...userData }: RegisterParams) => {
       return new File([blob], fileName, { type: mimeType });
     };
 
+    const file = base64ToFile(picture, `image.jpg`);
+
     // 2. Picture upload if provided
-    if (picture && process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID) {
+    if (picture && BUCKET_ID) {
       try {
-        const file = base64ToFile(picture, `image.jpg`);
         const pictureResponse = await storage.createFile(
-          process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID,
+          BUCKET_ID!,
           ID.unique(),
           file
         );
@@ -258,11 +255,11 @@ export const register = async ({  ...userData }: RegisterParams) => {
     // 3. Create user document
     try {
       const newUser = await database.createDocument(
-        process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-        process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID!,
+        DATABASE_ID!,
+        USER_COLLECTION_ID!,
         newUserAccount.$id,
         {
-          ...userData,
+          //...userData,
           userid: newUserAccount.$id,
           name: newUserAccount.name,
           email: newUserAccount.email,
@@ -275,6 +272,7 @@ export const register = async ({  ...userData }: RegisterParams) => {
           updated_at: new Date().toISOString(),
         }
       );
+
     } catch (error: any) {
       console.error('Document Creation Error:', {
         message: error.message,
@@ -287,7 +285,7 @@ export const register = async ({  ...userData }: RegisterParams) => {
     // 4. Send verification email
     try {
       const verification = await account.createVerification(
-        `${process.env.NEXT_PUBLIC_APP_URL}/verification`
+        `${VERIFICATION_URL}/verification`
       );
       if (!verification) {
         console.warn('Verification email not sent - user can resend later');
