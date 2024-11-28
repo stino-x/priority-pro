@@ -76,26 +76,26 @@ export const signIn = async ({ email, password }: SignInParams) => {
 
 export const handleVerification = async () => {
   try {
-    const { account, database } = await createAdminClient();
+    const { account } = await createSessionClient();
     
     // Get the current user - this will work if they're in a verification flow
     const currentUser = await account.get();
-    
+
     // Check if the email is verified
-    if (currentUser.emailVerification) {
-      // Update our database to match Appwrite's verification status
-      await database.updateDocument(
-        DATABASE_ID!,
-        USER_COLLECTION_ID!,
-        currentUser.$id,
-        { email_verified: true }
+    if (currentUser) {
+      const verification = await account.createVerification(
+        `${VERIFICATION_URL}/verify`
       );
-      
-      redirect('/dashboard');
+
     } else {
       redirect('/resend-verification');
     }
   } catch (error: any) {
+      console.error('Handle Verification Email Error:', {
+        message: error.message,
+        code: error.code,
+        response: error.response,
+      });
     if (error instanceof AppwriteException) {
       switch(error.code) {
         case 401: redirect('/login'); break;
@@ -135,29 +135,6 @@ export const resendVerificationEmail = async () => {
     throw new Error('Failed to resend verification email');
   }
 };
-
-
-// export  const  base64ToFile = (base64String: string, fileName: string) => {
-//   const [mimeInfo, base64Data] = base64String.split(',');
-//   const mimeTypeMatch = mimeInfo.match(/:(.*?);/);
-//   if (!mimeTypeMatch) {
-//     throw new Error('Invalid base64 string');
-//   }
-//   const mimeType = mimeTypeMatch[1];
-
-//   const binary = atob(base64Data);
-//   const binaryLength = binary.length;
-//   const binaryArray = new Uint8Array(binaryLength);
-
-//   for (let i = 0; i < binaryLength; i++) {
-//     binaryArray[i] = binary.charCodeAt(i);
-//   }
-
-//   const blob = new Blob([binaryArray], { type: mimeType });
-//   return new File([blob], fileName, { type: mimeType });
-// }
-
-
 
 export const register = async ({  ...userData }: RegisterParams) => {
   const { email, name, picture, restaurant, password } = userData;
@@ -232,7 +209,7 @@ export const register = async ({  ...userData }: RegisterParams) => {
       return new File([blob], fileName, { type: mimeType });
     };
 
-    const file = base64ToFile(picture, `image.jpg`);
+    const file = base64ToFile(picture, `${name}.jpg`);
 
     // 2. Picture upload if provided
     if (picture && BUCKET_ID) {
@@ -283,20 +260,20 @@ export const register = async ({  ...userData }: RegisterParams) => {
     }
 
     // 4. Send verification email
-    try {
-      const verification = await account.createVerification(
-        `${VERIFICATION_URL}/verification`
-      );
-      if (!verification) {
-        console.warn('Verification email not sent - user can resend later');
-      }
-    } catch (error: any) {
-      console.error('Verification Email Error:', {
-        message: error.message,
-        code: error.code,
-        response: error.response,
-      });
-    }
+    // try {
+    //   const verification = await account.createVerification(
+    //     `${VERIFICATION_URL}/verification`
+    //   );
+    //   if (!verification) {
+    //     console.warn('Verification email not sent - user can resend later');
+    //   }
+    // } catch (error: any) {
+    //   console.error('Verification Email Error:', {
+    //     message: error.message,
+    //     code: error.code,
+    //     response: error.response,
+    //   });
+    // }
 
     // 5. Create a session for the new user
     try {

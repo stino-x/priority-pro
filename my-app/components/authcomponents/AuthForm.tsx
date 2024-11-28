@@ -85,7 +85,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
         };
 
         const newUser = await register(userData);
-        if (newUser) router.push('/dashboard');
+        if (newUser) router.push('/verification');
       }
 
       if (type === 'signin') {
