@@ -2,14 +2,11 @@ import React from 'react';
 import { FormControl, FormField, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
 import { Control, FieldPath } from 'react-hook-form';
-import { z } from 'zod';
-import { authFormSchema } from '@/lib/utils';
+import { AuthFormSchema } from '@/lib/utils';
 
-const formSchema = authFormSchema('sign-up');
-
-interface CustomInputProps {
-  control: Control<z.infer<typeof formSchema>>;
-  name: FieldPath<z.infer<typeof formSchema>>;
+interface CustomInputProps<Type extends AuthFormSchema> {
+  control: Control<Type>;
+  name: FieldPath<Type>;
   label: string;
   placeholder?: string;
   type?: string;
@@ -18,7 +15,7 @@ interface CustomInputProps {
   options?: { label: string; value: string }[];
 }
 
-const CustomInput = ({
+const CustomInput = <Type extends AuthFormSchema>({
   control,
   name,
   label,
@@ -27,19 +24,22 @@ const CustomInput = ({
   isDropdown = false,
   isUploadFile = false,
   options = [],
-}: CustomInputProps) => {
+}: CustomInputProps<Type>) => {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
         <div className="form-item">
-          <FormLabel className="form-label">{label}</FormLabel>
+          <FormLabel htmlFor={name} className="form-label">
+            {label}
+          </FormLabel>
           <div className="flex w-full flex-col">
             <FormControl>
               {isUploadFile ? (
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                   <Input
+                    id={name}
                     type="file"
                     className="border-slate-600 bg-transparent border-2 rounded file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-600 file:text-white hover:file:bg-slate-700"
                     onChange={(e) => field.onChange(e.target.files)}
@@ -47,13 +47,15 @@ const CustomInput = ({
                 </div>
               ) : !isDropdown ? (
                 <Input
+                  id={name}
                   placeholder={placeholder}
                   className="border-slate-600 bg-transparent border-2 rounded"
-                  type={type === 'password' ? 'password' : type}
+                  type={type}
                   {...field}
                 />
               ) : (
                 <select
+                  id={name}
                   className="border-slate-600 bg-transparent border-2 rounded p-2"
                   {...field}
                 >

@@ -1,6 +1,6 @@
 'use server';
 
-import { ID, Query, OAuthProvider } from "node-appwrite";
+import { ID, Query, OAuthProvider, AppwriteException } from "node-appwrite";
 import { cookies } from "next/headers";
 import { parseStringify } from "../../lib/utils";
 import { createAdminClient, createSessionClient } from "../appwrite";
@@ -14,6 +14,7 @@ const {
   NEXT_PUBLIC_USER_COLLECTION_ID: USER_COLLECTION_ID,
   NEXT_PUBLIC_RESTAURANT_COLLECTION_ID: RESTAURANT_COLLECTION_ID,
   NEXT_PUBLIC_BUCKET_ID: BUCKET_ID,
+  NEXT_PUBLIC_APP_URL: VERIFICATION_URL,
 } = process.env;
 
 
@@ -22,7 +23,8 @@ interface RegisterParams {
   password: string;
   name: string;
   picture: string;
-  [key: string]: any;
+  restaurant: string;
+  // [key: string]: any;
 }
 
 interface SignInParams {
@@ -54,7 +56,7 @@ export const getUserInfo = async ( userid: string ) => {
 
 export const signIn = async ({ email, password }: SignInParams) => {
   try {
-    const { account } = await createSessionClient();
+    const { account } = await createAdminClient();
     const session = await account.createEmailPasswordSession(email, password);
 
     cookies().set("appwrite-session", session.secret, {
@@ -74,28 +76,36 @@ export const signIn = async ({ email, password }: SignInParams) => {
 
 export const handleVerification = async () => {
   try {
-    const { account, database } = await createAdminClient();
+    const { account } = await createSessionClient();
     
     // Get the current user - this will work if they're in a verification flow
     const currentUser = await account.get();
-    
+
     // Check if the email is verified
-    if (currentUser.emailVerification) {
-      // Update our database to match Appwrite's verification status
-      await database.updateDocument(
-        DATABASE_ID!,
-        USER_COLLECTION_ID!,
-        currentUser.$id,
-        { email_verified: true }
+    if (currentUser) {
+      const verification = await account.createVerification(
+        `${VERIFICATION_URL}/verify`
       );
-      
-      redirect('/dashboard');
+
     } else {
       redirect('/resend-verification');
     }
-  } catch (error) {
+  } catch (error: any) {
+      console.error('Handle Verification Email Error:', {
+        message: error.message,
+        code: error.code,
+        response: error.response,
+      });
+    if (error instanceof AppwriteException) {
+      switch(error.code) {
+        case 401: redirect('/login'); break;
+        case 404: redirect('/signup'); break;
+        default: redirect('/error');
+      }
+    }
     console.error('Verification error:', error);
     redirect('/error');
+  
   }
 };
 
@@ -126,43 +136,64 @@ export const resendVerificationEmail = async () => {
   }
 };
 
-
-// export  const  base64ToFile = (base64String: string, fileName: string) => {
-//   const [mimeInfo, base64Data] = base64String.split(',');
-//   const mimeTypeMatch = mimeInfo.match(/:(.*?);/);
-//   if (!mimeTypeMatch) {
-//     throw new Error('Invalid base64 string');
-//   }
-//   const mimeType = mimeTypeMatch[1];
-
-//   const binary = atob(base64Data);
-//   const binaryLength = binary.length;
-//   const binaryArray = new Uint8Array(binaryLength);
-
-//   for (let i = 0; i < binaryLength; i++) {
-//     binaryArray[i] = binary.charCodeAt(i);
-//   }
-
-//   const blob = new Blob([binaryArray], { type: mimeType });
-//   return new File([blob], fileName, { type: mimeType });
-// }
-
-
-
-export const register = async ({ password, ...userData }: RegisterParams) => {
-  const { email, name, picture } = userData;
+export const register = async ({  ...userData }: RegisterParams) => {
+  const { email, name, picture, restaurant, password } = userData;
   let newUserAccount;
   let pictureId = null;
   let account, database, storage;
 
+  const validateInput = (data: any) => {
+    const errors: string[] = [];
+
+    if (!data.email || typeof data.email !== 'string' || !data.email.includes('@')) {
+      errors.push('Invalid email');
+    }
+    if (!data.name || typeof data.name !== 'string' || data.name.trim().length < 2) {
+      errors.push('Invalid name');
+    }
+    if (!data.password || typeof data.password !== 'string' || data.password.length < 6) {
+      errors.push('Invalid password');
+    }
+    if (data.picture && (typeof data.picture !== 'string' || !data.picture.startsWith('data:image'))) {
+      errors.push('Invalid picture format');
+    }
+    return errors;
+  };
+
   try {
+    // Input validation
+    const validationErrors = validateInput({ email, name, password, picture });
+    if (validationErrors.length > 0) {
+      console.error('Validation Errors:', validationErrors);
+      throw new Error(`Validation failed: ${validationErrors.join(', ')}`);
+    }
+
+    // Initialize Appwrite services
     ({ account, database, storage } = await createAdminClient());
 
-    // 1. Create the user account first
-    newUserAccount = await account.create(ID.unique(), email, password, name);
-    if (!newUserAccount) throw new Error('Error creating user');
+    // Verbose logging for input
+    console.log('Registration Input:', {
+      email,
+      name,
+      pictureLength: picture ? picture.length : 'No picture',
+      restaurant,
+    });
 
-    const  base64ToFile = (base64String: string, fileName: string) => {
+    // 1. Create the user account
+    try {
+      newUserAccount = await account.create(ID.unique(), email, password, name);
+    } catch (error: any) {
+      console.error('Account Creation Error:', {
+        message: error.message,
+        code: error.code,
+        type: error.response?.type,
+        response: error.response,
+      });
+      throw error;
+    }
+
+    // Helper function to convert Base64 to File
+    const base64ToFile = (base64String: string, fileName: string) => {
       const [mimeInfo, base64Data] = base64String.split(',');
       const mimeTypeMatch = mimeInfo.match(/:(.*?);/);
       if (!mimeTypeMatch) {
@@ -170,87 +201,133 @@ export const register = async ({ password, ...userData }: RegisterParams) => {
       }
       const mimeType = mimeTypeMatch[1];
       const binary = atob(base64Data);
-      const binaryLength = binary.length;
-      const binaryArray = new Uint8Array(binaryLength);
-      for (let i = 0; i < binaryLength; i++) {
+      const binaryArray = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
         binaryArray[i] = binary.charCodeAt(i);
       }
       const blob = new Blob([binaryArray], { type: mimeType });
       return new File([blob], fileName, { type: mimeType });
-    }
+    };
 
-    const file = base64ToFile(picture, `image.jpg`);
+    const file = base64ToFile(picture, `${name}.jpg`);
 
-    let pictureId = null;
+    // 2. Picture upload if provided
     if (picture && BUCKET_ID) {
-      const pictureResponse = storage.createFile(
-        BUCKET_ID,
-        ID.unique(),
-        file
-      );
-      pictureId = (await pictureResponse).$id;
+      try {
+        const pictureResponse = await storage.createFile(
+          BUCKET_ID!,
+          ID.unique(),
+          file
+        );
+        pictureId = pictureResponse.$id;
+      } catch (error: any) {
+        console.error('Picture Upload Error:', {
+          message: error.message,
+          code: error.code,
+          response: error.response,
+        });
+      }
     }
 
-    // 3. Create user document using the same ID as the account
-    const newUser = await database.createDocument(
-      DATABASE_ID!,
-      USER_COLLECTION_ID!,
-      newUserAccount.$id, // Use same ID as account
-      {
-        ...userData,
-        userid: newUserAccount.$id,
-        name: newUserAccount.name,
-        email: newUserAccount.email,
-        picture: pictureId,
-        can_assign_tasks: false,
-        assigned_tasks: [],
-        email_verified: false,
-        created_at: new Date(newUserAccount.$createdAt).toISOString(),
-        updated_at: new Date().toISOString(),
-      }
-    );
+    // 3. Create user document
+    try {
+      const newUser = await database.createDocument(
+        DATABASE_ID!,
+        USER_COLLECTION_ID!,
+        newUserAccount.$id,
+        {
+          //...userData,
+          userid: newUserAccount.$id,
+          name: newUserAccount.name,
+          email: newUserAccount.email,
+          picture: pictureId,
+          restaurant,
+          can_assign_tasks: false,
+          assigned_tasks: [],
+          email_verified: false,
+          created_at: new Date(newUserAccount.$createdAt).toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+      );
+
+    } catch (error: any) {
+      console.error('Document Creation Error:', {
+        message: error.message,
+        code: error.code,
+        response: error.response,
+      });
+      throw error;
+    }
 
     // 4. Send verification email
+    // try {
+    //   const verification = await account.createVerification(
+    //     `${VERIFICATION_URL}/verification`
+    //   );
+    //   if (!verification) {
+    //     console.warn('Verification email not sent - user can resend later');
+    //   }
+    // } catch (error: any) {
+    //   console.error('Verification Email Error:', {
+    //     message: error.message,
+    //     code: error.code,
+    //     response: error.response,
+    //   });
+    // }
+
+    // 5. Create a session for the new user
     try {
-      const verification = await account.createVerification(
-        `${process.env.NEXT_PUBLIC_APP_URL}/verification`
-      );
-      if (!verification) {
-        // Log but don't throw - user can request verification email later
-        console.warn('Verification email not sent - will need to resend');
-      }
-    } catch (verificationError) {
-      console.error('Error sending verification:', verificationError);
-      // Continue registration but flag for follow-up
+      const session = await account.createEmailPasswordSession(email, password);
+      cookies().set('appwrite-session', session.secret, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true,
+      });
+    } catch (error: any) {
+      console.error('Session Creation Error:', {
+        message: error.message,
+        code: error.code,
+        response: error.response,
+      });
+      throw error;
     }
 
-    const session = await account.createEmailPasswordSession(email, password);
+    return parseStringify(newUserAccount);
 
-    cookies().set("appwrite-session", session.secret, {
-      path: "/",
-      httpOnly: true,
-      sameSite: "strict",
-      secure: true,
+  } catch (error: any) {
+    console.error('Complete Registration Error:', {
+      message: error.message,
+      code: error.code,
+      name: error.name,
+      stack: error.stack,
+      response: error.response,
     });
 
-
-    return parseStringify(newUser);
-  } catch (error) {
-    // If account was created but later steps failed, clean up
+    // Cleanup if the user account was created but other steps failed
     if (newUserAccount) {
-
       try {
         if (account) {
-          await account.deleteSession('current');
+          await account.deleteSession(newUserAccount.$id);
         }
-      } catch (cleanupError) {
-        console.error('Cleanup error:', cleanupError);
+      } catch (error: any) {
+        console.error('Cleanup Error:', {
+          message: error.message,
+          code: error.code,
+          response: error.response,
+        });
       }
     }
-    console.error('Error during user registration:', error);
+
     throw error;
   }
 };
+
+// Utility function for parsing objects
+// function parseStringify(obj: any) {
+//   return JSON.parse(JSON.stringify(obj));
+// }
+
 
 
 
@@ -264,7 +341,7 @@ export const getLoggedInUser = async () => {
     const user = await getUserInfo( result.$id)
 
     return parseStringify(user);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error)
     return null;
   }
