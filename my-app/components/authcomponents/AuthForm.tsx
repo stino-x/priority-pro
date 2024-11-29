@@ -94,7 +94,10 @@ const AuthForm = ({ type }: AuthFormProps) => {
           password: data.password,
         };
 
+        console.log('test signing in')
+
         const signInResult = await signIn(userData);
+
         if (signInResult) router.push('/dashboard');
       }
     } catch (error) {
@@ -157,6 +160,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
           )}
 
           {error && <p className="text-red-500 mt-2">{error}</p>}
+
 
           <Button type="submit" className="mt-4 w-full">
             {isLoading ? 'Loading...' : type === 'signin' ? 'Sign In' : 'Register'}

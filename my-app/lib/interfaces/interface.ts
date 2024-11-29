@@ -84,4 +84,5 @@ export interface Chat {
   user2_id: string;      // Identifier for the second user
   created_at: Date;      // Date and time when the chat was created
   title: string;         // Title of the chat
+  profilePicUrl : string
 }

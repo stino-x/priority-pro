@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { User } from "../interfaces/interface";
 import { useToast } from "@/hooks/use-toast";
+import { Client, Account } from "appwrite";
 
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
@@ -57,6 +58,7 @@ export const getUserInfo = async ( userid: string ) => {
 export const signIn = async ({ email, password }: SignInParams) => {
   try {
     const { account } = await createAdminClient();
+
     const session = await account.createEmailPasswordSession(email, password);
 
     cookies().set("appwrite-session", session.secret, {
@@ -136,8 +138,10 @@ export const resendVerificationEmail = async () => {
   }
 };
 
+
 export const register = async ({  ...userData }: RegisterParams) => {
   const { email, name, picture, restaurant, password } = userData;
+
   let newUserAccount;
   let pictureId = null;
   let account, database, storage;
@@ -258,22 +262,6 @@ export const register = async ({  ...userData }: RegisterParams) => {
       });
       throw error;
     }
-
-    // 4. Send verification email
-    // try {
-    //   const verification = await account.createVerification(
-    //     `${VERIFICATION_URL}/verification`
-    //   );
-    //   if (!verification) {
-    //     console.warn('Verification email not sent - user can resend later');
-    //   }
-    // } catch (error: any) {
-    //   console.error('Verification Email Error:', {
-    //     message: error.message,
-    //     code: error.code,
-    //     response: error.response,
-    //   });
-    // }
 
     // 5. Create a session for the new user
     try {
