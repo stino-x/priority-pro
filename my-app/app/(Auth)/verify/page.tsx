@@ -1,28 +1,43 @@
-'use client'
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { handleVerification } from "@/lib/actions/user.action";
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Account, Client } from 'appwrite';
 
-const EmailVerificationPage = () => {
+const VerifyPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId');
+  const secret = searchParams.get('secret');
   const [verificationStatus, setVerificationStatus] = useState('verifying');
-  
+
   useEffect(() => {
     const verifyEmail = async () => {
-      try {
-        await handleVerification();
-        setVerificationStatus('success');
+      const client = new Client()
+        .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
+        .setProject(process.env.NEXT_PUBLIC_PROJECT_ID!);
+      
+      const account = new Account(client);
 
+      try {
+        await account.updateVerification(
+          userId as string, 
+          secret as string
+        );
+
+        router.push('/dashboard');
+        setVerificationStatus('success');
       } catch (error) {
-        console.error('Verification failed:', error);
-        setVerificationStatus('error');
+
+        console.error('Verification failed', error);
+        router.push('/verification-failed');
       }
     };
 
-    verifyEmail();
-
-  }, []);
+    if (userId && secret) {
+      verifyEmail();
+    }
+  }, [userId, secret, router]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -79,10 +94,10 @@ const EmailVerificationPage = () => {
                 </svg>
               </div>
               <h2 className="text-2xl font-semibold text-gray-800">
-                Email Sent!
+                Email Verified!
               </h2>
               <p className="mt-2 text-gray-600">
-                Open Email To Verify Account.
+                Redirecting to Dashboard...
               </p>
             </>
           )}
@@ -122,6 +137,6 @@ const EmailVerificationPage = () => {
       </div>
     </div>
   );
-};
+}
 
-export default EmailVerificationPage;
+export default VerifyPage;
