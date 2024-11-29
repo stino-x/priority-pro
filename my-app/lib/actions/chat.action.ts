@@ -4,6 +4,7 @@ import { ID, Query } from "node-appwrite";
 import { parseStringify } from "../utils";
 import { createAdminClient } from "../appwrite";
 
+
 const {
   NEXT_PUBLIC_DATABASE_ID: DATABASE_ID,
   NEXT_PUBLIC_CHAT_COLLECTION_ID: CHAT_COLLECTION_ID,
@@ -31,12 +32,19 @@ export const createChat = async (user1: string, user2: string, title: string) =>
   }
 }
 
-export const getChats = async () => {
+export const getChats = async (userid: string) => {
   try {
     const { database } = await createAdminClient();
+
     const chat = await database.listDocuments(
       DATABASE_ID!,
       CHAT_COLLECTION_ID!,
+      [
+        Query.or([
+          Query.equal('user1_id', userid),
+          Query.equal('user2_id', userid)
+        ])
+      ]
     );
 
     const chats = {
@@ -54,7 +62,7 @@ export const getChats = async () => {
 export const getChat = async (chatId: string) => {
   try {
     const { database } = await createAdminClient();
-    console.log('*******', chatId)
+
     const chat = await database.listDocuments(
       DATABASE_ID!,
       CHAT_COLLECTION_ID!,

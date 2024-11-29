@@ -22,7 +22,7 @@ export default function Messages() {
         if (!loggedUser) throw new Error('No logged-in user found');
         setUser(loggedUser);
 
-        const fetchedChats = await getChats();
+        const fetchedChats = await getChats(loggedUser.userid);
 
         const chatWithTitles = await Promise.all(
           fetchedChats.map(async (chat: Chat) => {
@@ -50,7 +50,7 @@ export default function Messages() {
   }, []);
 
   return (
-    <div className="h-[100dvh] bg-green-200">
+    <div className="h-[100dvh">
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -64,11 +64,6 @@ export default function Messages() {
               text="start chatting..." 
               pic={chat.profilePicUrl} 
               />
-            {/* <MessageCard 
-              title={chat.title} 
-              text="start chatting..." 
-              pic={"https://source.unsplash.com/random"} 
-            /> */}
           </Link>
           
           ))}
